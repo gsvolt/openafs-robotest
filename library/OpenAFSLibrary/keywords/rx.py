@@ -36,3 +36,4 @@ class _RxKeywords(object):
         if not version:
             raise AssertionError("Failed to get version string.")
         return version
+
