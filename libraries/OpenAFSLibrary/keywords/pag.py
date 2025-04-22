@@ -20,18 +20,13 @@
 #
 
 import os
-import sys
 import subprocess
 from robot.api import logger
 from OpenAFSLibrary.variable import get_var, get_bool
 
 
-PY2 = sys.version_info[0] == 2
-
-
 PAG_MIN = 0x41000000
 PAG_MAX = 0x41FFFFFF
-PAG_ONEGROUP = True
 
 
 def _get_pag_from_one_group(gids):
@@ -65,7 +60,7 @@ def _pag_from_groups(gids):
     pag = None
     try:
         PAG_ONEGROUP = get_bool("PAG_ONEGROUP")
-    except:
+    except ValueError:
         PAG_ONEGROUP = True
 
     if PAG_ONEGROUP:
@@ -75,7 +70,7 @@ def _pag_from_groups(gids):
     return pag
 
 
-class _PagKeywords(object):
+class _PagKeywords:
 
     def pag_from_groups(self, gids=None):
         """Return the PAG from the given group id list."""
@@ -113,7 +108,7 @@ class _PagKeywords(object):
         if pag is None:
             raise AssertionError("PAG is None.")
         pag = pag.rstrip()
-        if pag == "None" or pag == "":
+        if pag in ["None", ""]:
             raise AssertionError("PAG is None.")
         pag = int(pag)
         logger.info("Checking PAG value %d" % (pag))
@@ -126,13 +121,12 @@ class _PagKeywords(object):
         PAGSH = get_var("PAGSH")
         logger.info("running %s" % (PAGSH,))
         logger.debug("script=%s" % (script,))
-        if not PY2:
-            script = script.encode("ascii")
-        pagsh = subprocess.Popen(
+        script = script.encode("ascii")
+        with subprocess.Popen(
             PAGSH, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-        )
-        (output, error) = pagsh.communicate(input=script)
-        code = pagsh.wait()
+        ) as pagsh:
+            (output, error) = pagsh.communicate(input=script)
+            code = pagsh.wait()
         if code == 0:
             logger.debug("stdin=%s" % (script,))
             logger.debug("code=%d" % (code,))
@@ -144,6 +138,5 @@ class _PagKeywords(object):
             logger.info("stdout=%s" % (output,))
             logger.info("stderr=%s" % (error,))
             raise AssertionError("Failed to run pagsh!")
-        if not PY2:
-            output = output.decode("ascii")
+        output = output.decode("ascii")
         return output

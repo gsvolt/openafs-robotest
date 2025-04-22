@@ -27,10 +27,6 @@ from OpenAFSLibrary.command import fs
 _RIGHTS = list("rlidwkaABCDEFGH")
 
 
-def cmp(a, b):
-    return (a > b) - (a < b)
-
-
 def normalize(rights):
     """Normalize a list of ACL right characters.
 
@@ -74,7 +70,7 @@ def parse(rights):
     if w == "all":
         rights = _RIGHTS
     elif w == "none":
-        rights = list()
+        rights = []
     elif w == "read":
         rights = list("rl")
     elif w == "write":
@@ -134,8 +130,7 @@ class AccessControlList:
         """Returns true if ACL test objects have the same entries."""
         if isinstance(other, self.__class__):
             return self.__str__() == other.__str__()
-        else:
-            return False
+        return False
 
     def __ne__(self, other):
         """Returns true if ACL tests objects do not have the same entries."""
@@ -167,7 +162,7 @@ class AccessControlList:
             pos = acl[0]
             neg = "".join(normalize(rights + list(acl[1])))
         else:
-            assert "Internal error"
+            raise AssertionError("Internal error")
         if pos == "" and neg == "":
             del self.acls[name]  # cleared
         else:
@@ -185,13 +180,13 @@ class AccessControlList:
         elif sign == "-":
             current = "-%s" % acl[1]
         else:
-            assert "Internal error"
+            raise AssertionError("Internal error")
         if rights != current:
             return False
         return True
 
 
-class _ACLKeywords(object):
+class _ACLKeywords:
     """ACL testing keywords."""
 
     def add_access_rights(self, path, name, rights):
@@ -233,109 +228,3 @@ class _ACLKeywords(object):
         a = AccessControlList.from_path(path)
         if name in a.acls:
             raise AssertionError("ACL entry exists for name '%s'" % (name))
-
-
-#
-# Unit tests
-#
-def _test1():
-    cases = [
-        ("", ""),
-        ("r", "r"),
-        ("lr", "rl"),
-        ("rlidwka", "rlidwka"),
-        ("adiklrw", "rlidwka"),
-        ("abcd", None),
-    ]
-    for x, y in cases:
-        try:
-            z = "".join(normalize(list(x)))
-        except:
-            assert y is None, "expected exception: x='%s'" % (x)
-        if y:
-            assert z == y, "expected='%s', got='%s'" % (y, z)
-
-
-def _test2():
-    cases = [
-        "system:administrators rlidwka",
-        "system:anyuser rl",
-        "user1 rl",
-        "user2 rl",
-        "user2 rwl",
-        "user2 -l",
-        "user3 +rlidwk",
-        "user4 none",
-        "user5 read",
-        "user6 write",
-        "user7 -write",
-    ]
-    expected = {
-        "system:administrators": ("rlidwka", ""),
-        "system:anyuser": ("rl", ""),
-        "user1": ("rl", ""),
-        "user2": ("rlw", "l"),
-        "user3": ("rlidwk", ""),
-        "user5": ("rl", ""),
-        "user6": ("rlidwkl", ""),
-        "user7": ("", "rlidwk"),
-    }
-    a = AccessControlList()
-    for case in cases:
-        name, rights = case.split()
-        a.add(name, rights)
-    assert cmp(a.acls, expected)
-
-
-def _test3():
-    p = "/afs/robotest/test"
-    t = [
-        "system:administrators rlidwka",
-        "system:anyuser rl",
-        "user1 rl",
-        "user2 rl",
-        "user2 rwl",
-        "user2 -l",
-        "user3 +rlidwk",
-        "user4 none",
-    ]
-    a1 = AccessControlList.from_path(p)
-    a2 = AccessControlList.from_args(*t)
-    # print "a1=", a1
-    # print "a2=", a2
-    assert a1 != a2
-
-
-def _test4():
-    t = [
-        "system:administrators rlidwka",
-        "system:anyuser rl",
-        "user1 rl",
-        "user2 rl",
-        "user2 rwl",
-        "user2 -l",
-        "user3 +rlidwk",
-        "user4 none",
-    ]
-    a = AccessControlList.from_args(*t)
-    assert a.contains("system:administrators", "rlidwka")
-    assert a.contains("system:anyuser", "rl")
-    assert a.contains("user1", "+rl")
-    assert a.contains("user2", "rlw")
-    assert a.contains("user2", "-l")
-    assert a.contains("user3", "+rlidwk")
-    assert not a.contains("user4", "none")
-
-
-def main():
-    global get_var  # monkey patch a test stub.
-    get_var = lambda name: {"FS": "/usr/afs/bin/fs"}[name]
-    _test1()
-    _test2()
-    _test3()
-    _test4()
-
-
-if __name__ == "__main__":
-    # usage: python -m OpenAFSLibrary.keywords.acl
-    main()

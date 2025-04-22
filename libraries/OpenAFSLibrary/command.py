@@ -19,17 +19,9 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #
 
-import sys
 import subprocess
 from robot.api import logger
 from OpenAFSLibrary.variable import get_var
-
-
-PY2 = sys.version_info[0] == 2
-if PY2:
-    string_types = (basestring,)
-else:
-    string_types = (str,)
 
 
 class CommandFailed(Exception):
@@ -49,7 +41,7 @@ class NoSuchEntryError(CommandFailed):
 
 
 def run_program(args):
-    if isinstance(args, string_types):
+    if isinstance(args, str):
         cmd_line = args
         shell = True
     else:
@@ -57,20 +49,17 @@ def run_program(args):
         cmd_line = " ".join(args)
         shell = False
     logger.info("running: %s" % cmd_line)
-    proc = subprocess.Popen(
+    with subprocess.Popen(
         args, shell=shell, bufsize=-1, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-    )
-    stdout, stderr = proc.communicate()
-    if proc.returncode:
-        logger.info("output: %s" % (stdout,))
-        logger.info("error: %s" % (stderr,))
-    if PY2:
-        output = stdout
-        error = stderr
-    else:
+    ) as proc:
+        stdout, stderr = proc.communicate()
+        rc = proc.returncode
+        if rc:
+            logger.info("output: %s" % (stdout,))
+            logger.info("error: %s" % (stderr,))
         output = stdout.decode("utf-8")
         error = stderr.decode("utf-8")
-    return (proc.returncode, output, error)
+    return (rc, output, error)
 
 
 def rxdebug(*args):

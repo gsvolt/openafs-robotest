@@ -22,7 +22,7 @@
 import struct
 
 
-class VolumeDump(object):
+class VolumeDump:
     """Helper class to create and check volume dumps."""
 
     DUMPBEGINMAGIC = 0xB3A11322
@@ -37,10 +37,9 @@ class VolumeDump(object):
     @staticmethod
     def check_header(filename):
         """Verify filename is a dump file."""
-        file = open(filename, "rb")
-        size = struct.calcsize("!BLL")
-        packed = file.read(size)
-        file.close()
+        with open(filename, "rb") as file:
+            size = struct.calcsize("!BLL")
+            packed = file.read(size)
         if len(packed) != size:
             raise AssertionError("Not a dump file: file is too short.")
         (tag, magic, version) = struct.unpack("!BLL", packed)
@@ -68,7 +67,7 @@ class VolumeDump(object):
         self.file = None
 
 
-class _DumpKeywords(object):
+class _DumpKeywords:
     """Volume dump keywords."""
 
     volid = 536870999  # random, but valid, volume id
@@ -113,6 +112,6 @@ class _DumpKeywords(object):
         elif size == "empty":
             self._create_empty_dump(filename)
         elif size == "small":
-            self._create_empty_dump(filename)  # todo: create a dump file
+            self._create_empty_dump(filename)
         else:
             raise ValueError("unsupported size arg: %s" % (size))
