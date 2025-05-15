@@ -8,3 +8,4 @@
 !.yamllint
 !.ansible-lint
 !.readthedocs.yaml
+output/
