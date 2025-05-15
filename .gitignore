@@ -8,3 +8,5 @@
 !.yamllint
 !.ansible-lint
 !.readthedocs.yaml
+output/
+robocop.txt
