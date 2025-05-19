@@ -115,24 +115,24 @@ Afs Server Running
 Same clock on all servers
     [Documentation]    Same clock on all servers
     ${rc_client1}    ${output_client1}=    client1.Run And Return Rc and Output    date +${DATE_FORMAT}
-    ${time_client1}=    Convert Date    ${output_client1}    result_format=datetime    date_format=%Y-%m-%dT%H:%M:%S.%N
+    ${time_client1}=    Convert Date    ${output_client1}    result_format=datetime
 
     ${rc_client2}    ${output_client2}=    client2.Run And Return Rc and Output    date +${DATE_FORMAT}
-    ${time_client2}=    Convert Date    ${output_client2}    result_format=datetime    date_format=%Y-%m-%dT%H:%M:%S.%N
+    ${time_client2}=    Convert Date    ${output_client2}    result_format=datetime
 
     ${rc_server1}    ${output_server1}=    client2.Run And Return Rc and Output    date +${DATE_FORMAT}
-    ${time_server1}=    Convert Date    ${output_server1}    result_format=datetime    date_format=%a %b %d %H:%M:%S %Z %Y
+    ${time_server1}=    Convert Date    ${output_server1}    result_format=datetime
 
     ${rc_server2}    ${output_server2}=    client2.Run And Return Rc and Output    date +${DATE_FORMAT}
-    ${time_server2}=    Convert Date    ${output_server2}    result_format=datetime    date_format=%a %b %d %H:%M:%S %Z %Y
+    ${time_server2}=    Convert Date    ${output_server2}    result_format=datetime
 
     ${rc_server3}    ${output_server3}=    client2.Run And Return Rc and Output    date +${DATE_FORMAT}
-    ${time_server3}=    Convert Date    ${output_server3}    result_format=datetime    date_format=%a %b %d %H:%M:%S %Z %Y
+    ${time_server3}=    Convert Date    ${output_server3}    result_format=datetime
 
-    ${time_diff1}=    Subtract Date From Date    ${time_client1}    ${time_client2}
-    ${time_diff2}=    Subtract Date From Date    ${time_client1}    ${time_server1}
-    ${time_diff3}=    Subtract Date From Date    ${time_client1}    ${time_server2}
-    ${time_diff4}=    Subtract Date From Date    ${time_client1}    ${time_server3}
+    ${time_diff1}=    Subtract Date From Date    ${time_client1}    ${time_client2}    date_format=datetime
+    ${time_diff2}=    Subtract Date From Date    ${time_client1}    ${time_server1}    date_format=datetime
+    ${time_diff3}=    Subtract Date From Date    ${time_client1}    ${time_server2}    date_format=datetime
+    ${time_diff4}=    Subtract Date From Date    ${time_client1}    ${time_server3}    date_format=datetime
 
     Should Be True    abs(${time_diff1}) <= 2.0    time difference ${time_diff1} is more than 2 seconds.
     Should Be True    abs(${time_diff2}) <= 2.0    time difference ${time_diff2} is more than 2 seconds.
