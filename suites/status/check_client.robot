@@ -88,7 +88,7 @@ Afs Server Running
 Same clock on all servers
     [Documentation]    Same clock on all servers
     ${rc_client1}    ${output_client1}=    client1.Run And Return Rc and Output    date +${DATE_FORMAT}
-    ${time_client1}=    Convert Date    ${output_client1}    result_format=datetime    date_format=%a %b %d %H:%M:%S %Z %Y
+    ${time_client1}=    Convert Date    ${output_client1}    result_format=datetime
 
     ${rc_client2}    ${output_client2}=    client2.Run And Return Rc and Output    date +${DATE_FORMAT}
     ${time_client2}=    Convert Date    ${output_client2}    result_format=datetime    date_format=%a %b %d %H:%M:%S %Z %Y
