@@ -18,17 +18,44 @@ Ping all servers
     client2.Command Should Succeed   true
 
 Bos Status
-    [Documentation]    Bos Status
+    [Documentation]    Run bos status (unauthenticated) on both clients and ensure
+    ...    openafs servers are running.
     ${rc}    ${output}=    client1.Run And Return Rc and Output    bos status server1
     Log    ${rc}
     Log    ${output}
     Should Be Equal As Integers    ${rc}    0
-    Should Contain    ${output}    file server running
+    Should Contain Any    ${output}    Instance ptserver, currently running normally.    Instance vlserver, currently running normally.    Instance dafs, currently running normally.    Auxiliary status is: file server running.
+
+    ${rc}    ${output}=    client1.Run And Return Rc and Output    bos status server2
+    Log    ${rc}
+    Log    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain Any    ${output}    Instance ptserver, currently running normally.    Instance vlserver, currently running normally.    Instance dafs, currently running normally.    Auxiliary status is: file server running.
+
+    ${rc}    ${output}=    client1.Run And Return Rc and Output    bos status server3
+    Log    ${rc}
+    Log    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain Any    ${output}    Instance ptserver, currently running normally.    Instance vlserver, currently running normally.    Instance dafs, currently running normally.    Auxiliary status is: file server running.
+
     ${rc}    ${output}=    client2.Run And Return Rc and Output    bos status server1
     Log    ${rc}
     Log    ${output}
     Should Be Equal As Integers    ${rc}    0
-    Should Contain    ${output}    file server running
+    Should Contain Any    ${output}    Instance ptserver, currently running normally.    Instance vlserver, currently running normally.    Instance dafs, currently running normally.    Auxiliary status is: file server running.
+
+    ${rc}    ${output}=    client2.Run And Return Rc and Output    bos status server2
+    Log    ${rc}
+    Log    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain Any    ${output}    Instance ptserver, currently running normally.    Instance vlserver, currently running normally.    Instance dafs, currently running normally.    Auxiliary status is: file server running.
+
+    ${rc}    ${output}=    client2.Run And Return Rc and Output    bos status server3
+    Log    ${rc}
+    Log    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain Any    ${output}    Instance ptserver, currently running normally.    Instance vlserver, currently running normally.    Instance dafs, currently running normally.    Auxiliary status is: file server running.
+
 
 Cache Manager Running
     [Documentation]    Cache Manager Running
