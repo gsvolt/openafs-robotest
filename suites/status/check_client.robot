@@ -1,10 +1,12 @@
 *** Settings ***
 Variables    Variables.py
+Library    DateTime
 Library    Remote    ${REMOTE_SERVER1_URL}    AS   ${REMOTE_SERVER1}
 Library    Remote    ${REMOTE_SERVER2_URL}    AS   ${REMOTE_SERVER2}
 Library    Remote    ${REMOTE_SERVER3_URL}    AS   ${REMOTE_SERVER3}
 Library    Remote    ${REMOTE_CLIENT1_URL}    AS   ${REMOTE_CLIENT1}
 Library    Remote    ${REMOTE_CLIENT2_URL}    AS   ${REMOTE_CLIENT2}
+
 
 *** Test Cases ***
 Ping all servers
@@ -84,5 +86,6 @@ Same clock on all servers
     ${rc_server1}    ${output_server1}=    server1.Run And Return Rc and Output    date
     ${rc_server2}    ${output_server2}=    server2.Run And Return Rc and Output    date
     ${rc_server3}    ${output_server3}=    server3.Run And Return Rc and Output    date
-    ${time}    Subtract Date From Date    ${output_client1}    ${output_client2}
-    Log    ${time}
+    ${time_diff}    Subtract Date From Date    ${output_client1}    ${output_client2}
+    Log    ${time_diff}
+    Should Be True    ${time_diff} <= 2.0    time difference ${time_diff} is more than 2 seconds.
