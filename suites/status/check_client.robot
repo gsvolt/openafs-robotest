@@ -76,3 +76,13 @@ Afs Server Running
     Log    ${output}
     Should Be Equal As Integers    ${rc}    0
     Should Contain    ${output}    active
+
+
+Same clock on all servers
+    ${rc_client1}    ${output_client1}=    client1.Run And Return Rc and Output    date
+    ${rc_client2}    ${output_client2}=    client2.Run And Return Rc and Output    date
+    ${rc_server1}    ${output_server1}=    server1.Run And Return Rc and Output    date
+    ${rc_server2}    ${output_server2}=    server2.Run And Return Rc and Output    date
+    ${rc_server3}    ${output_server3}=    server3.Run And Return Rc and Output    date
+    ${time}    Subtract Date From Date    ${output_client1}    ${output_client2}
+    Log    ${time}
