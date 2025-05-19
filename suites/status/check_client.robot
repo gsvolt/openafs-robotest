@@ -14,36 +14,65 @@ Ping all servers
     client1.Command Should Succeed   true
     client2.Command Should Succeed   true
 
-
 Bos Status
     ${rc}    ${output}=    client1.Run And Return Rc and Output    bos status server1
     Log    ${rc}
     Log    ${output}
     Should Be Equal As Integers    ${rc}    0
-    Should Contain    ${output}    "file server running"
+    Should Contain    ${output}    file server running
     ${rc}    ${output}=    client2.Run And Return Rc and Output    bos status server1
     Log    ${rc}
     Log    ${output}
     Should Be Equal As Integers    ${rc}    0
-    Should Contain    ${output}    "file server running"
-
-Afs Client Running
-    ${rc}    ${output}=    client1.Run And Return Rc and Output    systemctl is-active openafs-client
-    Log    ${rc}
-    Log    ${output}
-    Should Be Equal As Integers    ${rc}    0
-    Should Contain    ${output}    "active"
+    Should Contain    ${output}    file server running
 
 Cache Manager Running
     ${rc}    ${output}=    client1.Run And Return Rc and Output    fs checkservers
     Log    ${rc}
     Log    ${output}
     Should Be Equal As Integers    ${rc}    0
-    Should Contain    ${output}    "All servers are running"
+    Should Contain    ${output}    All servers are running
     ${rc}    ${output}=    client1.Run And Return Rc and Output    mount | grep afs
     Log    ${rc}
     Log    ${output}
     Should Be Equal As Integers    ${rc}    0
-    Should Contain    ${output}    "AFS on /afs type afs"
+    Should Contain    ${output}    AFS on /afs type afs
+    ${rc}    ${output}=    client2.Run And Return Rc and Output    fs checkservers
+    Log    ${rc}
+    Log    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain    ${output}    All servers are running
+    ${rc}    ${output}=    client2.Run And Return Rc and Output    mount | grep afs
+    Log    ${rc}
+    Log    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain    ${output}    AFS on /afs type afs
 
+Afs Client Running
+    ${rc}    ${output}=    client1.Run And Return Rc and Output    systemctl is-active openafs-client
+    Log    ${rc}
+    Log    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain    ${output}    active
+    ${rc}    ${output}=    client2.Run And Return Rc and Output    systemctl is-active openafs-client
+    Log    ${rc}
+    Log    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain    ${output}    active
 
+Afs Server Running
+    ${rc}    ${output}=    server1.Run And Return Rc and Output    systemctl is-active openafs-server
+    Log    ${rc}
+    Log    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain    ${output}    active
+    ${rc}    ${output}=    server2.Run And Return Rc and Output    systemctl is-active openafs-server
+    Log    ${rc}
+    Log    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain    ${output}    active
+    ${rc}    ${output}=    server3.Run And Return Rc and Output    systemctl is-active openafs-server
+    Log    ${rc}
+    Log    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain    ${output}    active
