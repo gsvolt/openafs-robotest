@@ -10,6 +10,7 @@ Library    Remote    ${REMOTE_CLIENT2_URL}    AS   ${REMOTE_CLIENT2}
 
 *** Test Cases ***
 Ping all servers
+    [Documentation]    Ping all servers
     server1.Command Should Succeed   true
     server2.Command Should Succeed   true
     server3.Command Should Succeed   true
@@ -17,6 +18,7 @@ Ping all servers
     client2.Command Should Succeed   true
 
 Bos Status
+    [Documentation]    Bos Status
     ${rc}    ${output}=    client1.Run And Return Rc and Output    bos status server1
     Log    ${rc}
     Log    ${output}
@@ -29,6 +31,7 @@ Bos Status
     Should Contain    ${output}    file server running
 
 Cache Manager Running
+    [Documentation]    Cache Manager Running
     ${rc}    ${output}=    client1.Run And Return Rc and Output    fs checkservers
     Log    ${rc}
     Log    ${output}
@@ -51,6 +54,7 @@ Cache Manager Running
     Should Contain    ${output}    AFS on /afs type afs
 
 Afs Client Running
+    [Documentation]    
     ${rc}    ${output}=    client1.Run And Return Rc and Output    systemctl is-active openafs-client
     Log    ${rc}
     Log    ${output}
@@ -63,6 +67,7 @@ Afs Client Running
     Should Contain    ${output}    active
 
 Afs Server Running
+    [Documentation]    Afs Server Running
     ${rc}    ${output}=    server1.Run And Return Rc and Output    systemctl is-active openafs-server
     Log    ${rc}
     Log    ${output}
@@ -81,11 +86,17 @@ Afs Server Running
 
 
 Same clock on all servers
+    [Documentation]    Same clock on all servers
     ${rc_client1}    ${output_client1}=    client1.Run And Return Rc and Output    date
+    ${time_client1}=    Convert Date    ${output_client1}    result_format=datetime
+
     ${rc_client2}    ${output_client2}=    client2.Run And Return Rc and Output    date
-    ${rc_server1}    ${output_server1}=    server1.Run And Return Rc and Output    date
-    ${rc_server2}    ${output_server2}=    server2.Run And Return Rc and Output    date
-    ${rc_server3}    ${output_server3}=    server3.Run And Return Rc and Output    date
-    ${time_diff}    Subtract Date From Date    ${output_client1}    ${output_client2}
+    ${time_client2}=    Convert Date    ${output_client2}    result_format=datetime
+
+    ${time_diff}    Subtract Date From Date    ${time_client1}    ${time_client2}
     Log    ${time_diff}
-    Should Be True    ${time_diff} <= 2.0    time difference ${time_diff} is more than 2 seconds.
+    Should Be True    abs(${time_diff}) <= 2.0    time difference ${time_diff} is more than 2 seconds.
+
+    # ${rc_server1}    ${output_server1}=    server1.Run And Return Rc and Output    date
+    # ${rc_server2}    ${output_server2}=    server2.Run And Return Rc and Output    date
+    # ${rc_server3}    ${output_server3}=    server3.Run And Return Rc and Output    date
