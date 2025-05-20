@@ -129,6 +129,6 @@ Same clock on all servers
     Log    ${rc}
     Log    ${output}
     Should Be Equal As Integers    ${rc}    0
-    ${time_diff}=    String.Get Regexp Matches    ${output}    time differential (\d) secs
+    ${time_diff}=    String.Get Regexp Matches    ${output}    time differential (\\d) secs
     Log    ${time_diff}
     Should Be True    ${time_diff} <= 10    time difference ${time_diff} is more than 10 seconds
