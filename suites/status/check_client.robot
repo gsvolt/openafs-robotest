@@ -2,11 +2,11 @@
 Variables    Variables.py
 Library    DateTime
 Library    String
-Library    Remote    ${REMOTE_SERVER1_URL}    AS   ${REMOTE_SERVER1}
-Library    Remote    ${REMOTE_SERVER2_URL}    AS   ${REMOTE_SERVER2}
-Library    Remote    ${REMOTE_SERVER3_URL}    AS   ${REMOTE_SERVER3}
-Library    Remote    ${REMOTE_CLIENT1_URL}    AS   ${REMOTE_CLIENT1}
-Library    Remote    ${REMOTE_CLIENT2_URL}    AS   ${REMOTE_CLIENT2}
+Library    Remote    ${REMOTE_SERVER1_URL}    AS   server1
+Library    Remote    ${REMOTE_SERVER2_URL}    AS   server2
+Library    Remote    ${REMOTE_SERVER3_URL}    AS   server3
+Library    Remote    ${REMOTE_CLIENT1_URL}    AS   client1
+Library    Remote    ${REMOTE_CLIENT2_URL}    AS   client2
 
 
 *** Test Cases ***
@@ -125,18 +125,29 @@ Same clock on all servers
     ...    There is a chance that server clocks in use can go out sync with each other
     ...    This test calls udebug utility and checks for the time differential value.
 
-    ${rc}    ${output}=    client1.Run And Return Rc and Output    udebug -server server1 -port 7002
+    ${rc}    ${output}=    server1.Run And Return Rc and Output    udebug -server server2 -port 7002
     Log    ${rc}
     Log    ${output}
     Should Be Equal As Integers    ${rc}    0
+    Should Not Contain    ${output}    ****clock may be bad
     ${time_diff}=    String.Get Regexp Matches    ${output}    differential (\\d+) secs    1
     Log    int(${time_diff}[0])
     Should Be True    int(${time_diff}[0]) <= 10    time difference ${time_diff} is more than 10 seconds
 
-    ${rc}    ${output}=    client2.Run And Return Rc and Output    udebug -server server1 -port 7002
+    ${rc}    ${output}=    server1.Run And Return Rc and Output    udebug -server server3 -port 7002
     Log    ${rc}
     Log    ${output}
     Should Be Equal As Integers    ${rc}    0
+    Should Not Contain    ${output}    ****clock may be bad
+    ${time_diff}=    String.Get Regexp Matches    ${output}    differential (\\d+) secs    1
+    Log    int(${time_diff}[0])
+    Should Be True    int(${time_diff}[0]) <= 10    time difference ${time_diff} is more than 10 seconds
+
+    ${rc}    ${output}=    server2.Run And Return Rc and Output    udebug -server server3 -port 7002
+    Log    ${rc}
+    Log    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    Should Not Contain    ${output}    ****clock may be bad
     ${time_diff}=    String.Get Regexp Matches    ${output}    differential (\\d+) secs    1
     Log    int(${time_diff}[0])
     Should Be True    int(${time_diff}[0]) <= 10    time difference ${time_diff} is more than 10 seconds
