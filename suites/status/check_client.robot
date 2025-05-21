@@ -118,9 +118,8 @@ Afs Server Running
     Should Be Equal As Integers    ${rc}    0
     Should Contain    ${output}    active
 
-
-Same clock on all servers
-    [Documentation]    Same clock on all servers
+Servers have no skew in their time
+    [Documentation]    Servers have no skew in their time
     ...    
     ...    There is a chance that server clocks in use can go out sync with each other
     ...    This test calls udebug utility and checks for the time differential value.
@@ -151,3 +150,5 @@ Same clock on all servers
     ${time_diff}=    String.Get Regexp Matches    ${output}    differential (\\d+) secs    1
     Log    int(${time_diff}[0])
     Should Be True    int(${time_diff}[0]) <= 10    time difference ${time_diff} is more than 10 seconds
+
+
