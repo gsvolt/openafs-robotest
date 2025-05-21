@@ -131,5 +131,12 @@ Same clock on all servers
     Should Be Equal As Integers    ${rc}    0
     ${time_diff}=    String.Get Regexp Matches    ${output}    differential (\\d+) secs    1
     Log    int(${time_diff}[0])
-    Should Be True    int(${time_diff}[0]) <= 2    time difference ${time_diff} is more than 10 seconds
+    Should Be True    int(${time_diff}[0]) <= 10    time difference ${time_diff} is more than 10 seconds
 
+    ${rc}    ${output}=    client2.Run And Return Rc and Output    udebug -server server1 -port 7002
+    Log    ${rc}
+    Log    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    ${time_diff}=    String.Get Regexp Matches    ${output}    differential (\\d+) secs    1
+    Log    int(${time_diff}[0])
+    Should Be True    int(${time_diff}[0]) <= 10    time difference ${time_diff} is more than 10 seconds
