@@ -2,11 +2,14 @@
 Variables    Variables.py
 Library    DateTime
 Library    String
-Library    Remote    ${REMOTE_SERVER1_URL}    AS   server1
-Library    Remote    ${REMOTE_SERVER2_URL}    AS   server2
-Library    Remote    ${REMOTE_SERVER3_URL}    AS   server3
-Library    Remote    ${REMOTE_CLIENT1_URL}    AS   client1
-Library    Remote    ${REMOTE_CLIENT2_URL}    AS   client2
+Library    Remote    http://server1.${DOMAIN_NAME}:${PORT}    AS   server1
+Library    Remote    http://server2.${DOMAIN_NAME}:${PORT}    AS   server2
+Library    Remote    http://server3.${DOMAIN_NAME}:${PORT}    AS   server3
+Library    Remote    http://client1.${DOMAIN_NAME}:${PORT}    AS   client1
+Library    Remote    http://client2.${DOMAIN_NAME}:${PORT}    AS   client2
+
+
+
 
 
 *** Test Cases ***
@@ -151,4 +154,12 @@ Servers have no skew in their time
     Log    int(${time_diff}[0])
     Should Be True    int(${time_diff}[0]) <= 10    time difference ${time_diff} is more than 10 seconds
 
+    ${rc}    ${output}=    client1.Run And Return Rc and Output    udebug -server server1 -port 7002
+    Log    ${rc}
+    Log    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain    ${output}    Recovery state 1f
+    ${time_diff}=    String.Get Regexp Matches    ${output}    differential (\\d+) secs    1
+    Log    int(${time_diff}[0])
+    Should Be True    int(${time_diff}[0]) <= 10    time difference ${time_diff} is more than 10 seconds
 
