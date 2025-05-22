@@ -189,53 +189,53 @@ Partitions have available diskspace
     ${rc}    ${output}=    server1.Run And Return Rc and Output    vos partinfo server1.example.com /vicepa
     Should Not Contain    ${output}    partition /vicepa does not exist on the server
     Should Contain    ${output}    Free space on partition /vicepa
-    ${free_space}=    String.Get Regexp Matches    ${output}    (\\d+) K blocks out of total (\\d+)    2
-    Should Be True    int(${free_space}[0]) < int(${free_space}[1])    server1: Partition vicepa disk space is running out!
+    ${free_space}=    String.Get Regexp Matches    ${output}    (\\d+) K blocks out of total (\\d+)    1    2
+    Should Be True    int(${free_space}[0][0]) < int(${free_space}[0][1])    server1: Partition vicepa disk space is running out!
 
     ${rc}    ${output}=    server1.Run And Return Rc and Output    vos partinfo server1.example.com /vicepb
     Should Not Contain    ${output}    partition /vicepb does not exist on the server
     Should Contain    ${output}    Free space on partition /vicepb
     ${free_space}=    String.Get Regexp Matches    ${output}    (\\d+) K blocks out of total (\\d+)    2
-    Should Be True    int(${free_space}[0]) < int(${free_space}[1])    server1: Partition vicepb disk space is running out!
+    Should Be True    int(${free_space}[0][0]) < int(${free_space}[0][1])    server1: Partition vicepb disk space is running out!
 
     ${rc}    ${output}=    server1.Run And Return Rc and Output    vos partinfo server1.example.com /vicepc
     Should Not Contain    ${output}    partition /vicepc does not exist on the server
     Should Contain    ${output}    Free space on partition /vicepc
     ${free_space}=    String.Get Regexp Matches    ${output}    (\\d+) K blocks out of total (\\d+)    2
-    Should Be True    int(${free_space}[0]) < int(${free_space}[1])    server1: Partition vicepc disk space is running out!
+    Should Be True    int(${free_space}[0][0]) < int(${free_space}[0][1])    server1: Partition vicepc disk space is running out!
 
     ${rc}    ${output}=    server1.Run And Return Rc and Output    vos partinfo server2.example.com /vicepa
     Should Not Contain    ${output}    partition /vicepa does not exist on the server
     Should Contain    ${output}    Free space on partition /vicepa
     ${free_space}=    String.Get Regexp Matches    ${output}    (\\d+) K blocks out of total (\\d+)    2
-    Should Be True    int(${free_space}[0]) < int(${free_space}[1])    server2: Partition vicepa disk space is running out!
+    Should Be True    int(${free_space}[0][0]) < int(${free_space}[0][1])    server2: Partition vicepa disk space is running out!
 
     ${rc}    ${output}=    server1.Run And Return Rc and Output    vos partinfo server2.example.com /vicepb
     Should Not Contain    ${output}    partition /vicepb does not exist on the server
     Should Contain    ${output}    Free space on partition /vicepb
     ${free_space}=    String.Get Regexp Matches    ${output}    (\\d+) K blocks out of total (\\d+)    2
-    Should Be True    int(${free_space}[0]) < int(${free_space}[1])    server2: Partition vicepb disk space is running out!
+    Should Be True    int(${free_space}[0][0]) < int(${free_space}[0][1])    server2: Partition vicepb disk space is running out!
 
     ${rc}    ${output}=    server1.Run And Return Rc and Output    vos partinfo server2.example.com /vicepc
     Should Not Contain    ${output}    partition /vicepc does not exist on the server
     Should Contain    ${output}    Free space on partition /vicepc
     ${free_space}=    String.Get Regexp Matches    ${output}    (\\d+) K blocks out of total (\\d+)    2
-    Should Be True    int(${free_space}[0]) < int(${free_space}[1])    server2: Partition vicepc disk space is running out!
+    Should Be True    int(${free_space}[0][0]) < int(${free_space}[0][1])    server2: Partition vicepc disk space is running out!
 
     ${rc}    ${output}=    server1.Run And Return Rc and Output    vos partinfo server3.example.com /vicepa
     Should Not Contain    ${output}    partition /vicepa does not exist on the server
     Should Contain    ${output}    Free space on partition /vicepa
     ${free_space}=    String.Get Regexp Matches    ${output}    (\\d+) K blocks out of total (\\d+)    2
-    Should Be True    int(${free_space}[0]) < int(${free_space}[1])    server3: Partition vicepa disk space is running out!
+    Should Be True    int(${free_space}[0][0]) < int(${free_space}[0][1])    server3: Partition vicepa disk space is running out!
 
     ${rc}    ${output}=    server1.Run And Return Rc and Output    vos partinfo server3.example.com /vicepb
     Should Not Contain    ${output}    partition /vicepb does not exist on the server
     Should Contain    ${output}    Free space on partition /vicepb
     ${free_space}=    String.Get Regexp Matches    ${output}    (\\d+) K blocks out of total (\\d+)    2
-    Should Be True    int(${free_space}[0]) < int(${free_space}[1])    server3: Partition vicepb disk space is running out!
+    Should Be True    int(${free_space}[0][0]) < int(${free_space}[0][1])    server3: Partition vicepb disk space is running out!
 
     ${rc}    ${output}=    server1.Run And Return Rc and Output    vos partinfo server3.example.com /vicepc
     Should Not Contain    ${output}    partition /vicepc does not exist on the server
     Should Contain    ${output}    Free space on partition /vicepc
     ${free_space}=    String.Get Regexp Matches    ${output}    (\\d+) K blocks out of total (\\d+)    2
-    Should Be True    int(${free_space}[0]) < int(${free_space}[1])    server3: Partition vicepc disk space is running out!
+    Should Be True    int(${free_space}[0][0]) < int(${free_space}[0][1])    server3: Partition vicepc disk space is running out!
