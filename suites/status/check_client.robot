@@ -9,9 +9,6 @@ Library    Remote    http://client1.${DOMAIN_NAME}:${PORT}    AS   client1
 Library    Remote    http://client2.${DOMAIN_NAME}:${PORT}    AS   client2
 
 
-
-
-
 *** Test Cases ***
 Ping all servers
     [Documentation]    Ping all servers
@@ -154,6 +151,7 @@ Servers have no skew in their time
     Log    int(${time_diff}[0])
     Should Be True    int(${time_diff}[0]) <= 10    time difference ${time_diff} is more than 10 seconds
 
+    # Only on client1 check status of database quorum: 1f
     ${rc}    ${output}=    client1.Run And Return Rc and Output    udebug -server server1 -port 7002
     Log    ${rc}
     Log    ${output}
@@ -163,3 +161,81 @@ Servers have no skew in their time
     Log    int(${time_diff}[0])
     Should Be True    int(${time_diff}[0]) <= 10    time difference ${time_diff} is more than 10 seconds
 
+Cell volumes exist in vldb
+    [Documentation]    Cell volumes exist in vldb
+
+    ${rc}    ${output}=    server1.Run And Return Rc and Output    vos listvldb
+    Log    ${rc}
+    Log    ${output}
+    Should Contain Any    ${output}    server server3.example.com partition /vicepa RW Site    server server3.example.com partition /vicepa RO Site    server server2.example.com partition /vicepa RO Site    server server1.example.com partition /vicepa RO Site    root.afs    root.cell    number of sites -> 4
+
+    ${rc}    ${output}=    server1.Run And Return Rc and Output    vos listvol -server localhost
+    Log    ${rc}
+    Log    ${output}
+    Should Contain    ${output}    Total volumes onLine 3
+
+    ${rc}    ${output}=    server2.Run And Return Rc and Output    vos listvldb
+    Log    ${rc}
+    Log    ${output}
+    Should Contain Any    ${output}    server server3.example.com partition /vicepa RW Site    server server3.example.com partition /vicepa RO Site    server server2.example.com partition /vicepa RO Site    server server1.example.com partition /vicepa RO Site    root.afs    root.cell    number of sites -> 4
+
+    ${rc}    ${output}=    server3.Run And Return Rc and Output    vos listvldb
+    Log    ${rc}
+    Log    ${output}
+    Should Contain Any    ${output}    server server3.example.com partition /vicepa RW Site    server server3.example.com partition /vicepa RO Site    server server2.example.com partition /vicepa RO Site    server server1.example.com partition /vicepa RO Site    root.afs    root.cell    number of sites -> 4
+
+Partitions have available diskspace
+    [Documentation]    Partitions have available diskspace
+    ${rc}    ${output}=    server1.Run And Return Rc and Output    vos partinfo server1.example.com /vicepa
+    Should Not Contain    ${output}    partition /vicepa does not exist on the server
+    Should Contain    ${output}    Free space on partition /vicepa
+    ${free_space}=    String.Get Regexp Matches    ${output}    (\\d+) K blocks out of total (\\d+)
+    Should Be True    int(${free_space}[0]) < int(${freespace}[1])    server1: Partition vicepa disk space is running out!
+
+    ${rc}    ${output}=    server1.Run And Return Rc and Output    vos partinfo server1.example.com /vicepb
+    Should Not Contain    ${output}    partition /vicepb does not exist on the server
+    Should Contain    ${output}    Free space on partition /vicepb
+    ${free_space}=    String.Get Regexp Matches    ${output}    (\\d+) K blocks out of total (\\d+)
+    Should Be True    int(${free_space}[0]) < int(${freespace}[1])    server1: Partition vicepb disk space is running out!
+
+    ${rc}    ${output}=    server1.Run And Return Rc and Output    vos partinfo server1.example.com /vicepc
+    Should Not Contain    ${output}    partition /vicepc does not exist on the server
+    Should Contain    ${output}    Free space on partition /vicepc
+    ${free_space}=    String.Get Regexp Matches    ${output}    (\\d+) K blocks out of total (\\d+)
+    Should Be True    int(${free_space}[0]) < int(${freespace}[1])    server1: Partition vicepc disk space is running out!
+
+    ${rc}    ${output}=    server1.Run And Return Rc and Output    vos partinfo server2.example.com /vicepa
+    Should Not Contain    ${output}    partition /vicepa does not exist on the server
+    Should Contain    ${output}    Free space on partition /vicepa
+    ${free_space}=    String.Get Regexp Matches    ${output}    (\\d+) K blocks out of total (\\d+)
+    Should Be True    int(${free_space}[0]) < int(${freespace}[1])    server2: Partition vicepa disk space is running out!
+
+    ${rc}    ${output}=    server1.Run And Return Rc and Output    vos partinfo server2.example.com /vicepb
+    Should Not Contain    ${output}    partition /vicepb does not exist on the server
+    Should Contain    ${output}    Free space on partition /vicepb
+    ${free_space}=    String.Get Regexp Matches    ${output}    (\\d+) K blocks out of total (\\d+)
+    Should Be True    int(${free_space}[0]) < int(${freespace}[1])    server2: Partition vicepb disk space is running out!
+
+    ${rc}    ${output}=    server1.Run And Return Rc and Output    vos partinfo server2.example.com /vicepc
+    Should Not Contain    ${output}    partition /vicepc does not exist on the server
+    Should Contain    ${output}    Free space on partition /vicepc
+    ${free_space}=    String.Get Regexp Matches    ${output}    (\\d+) K blocks out of total (\\d+)
+    Should Be True    int(${free_space}[0]) < int(${freespace}[1])    server2: Partition vicepc disk space is running out!
+
+    ${rc}    ${output}=    server1.Run And Return Rc and Output    vos partinfo server3.example.com /vicepa
+    Should Not Contain    ${output}    partition /vicepa does not exist on the server
+    Should Contain    ${output}    Free space on partition /vicepa
+    ${free_space}=    String.Get Regexp Matches    ${output}    (\\d+) K blocks out of total (\\d+)
+    Should Be True    int(${free_space}[0]) < int(${freespace}[1])    server3: Partition vicepa disk space is running out!
+
+    ${rc}    ${output}=    server1.Run And Return Rc and Output    vos partinfo server3.example.com /vicepb
+    Should Not Contain    ${output}    partition /vicepb does not exist on the server
+    Should Contain    ${output}    Free space on partition /vicepb
+    ${free_space}=    String.Get Regexp Matches    ${output}    (\\d+) K blocks out of total (\\d+)
+    Should Be True    int(${free_space}[0]) < int(${freespace}[1])    server3: Partition vicepb disk space is running out!
+
+    ${rc}    ${output}=    server1.Run And Return Rc and Output    vos partinfo server3.example.com /vicepc
+    Should Not Contain    ${output}    partition /vicepc does not exist on the server
+    Should Contain    ${output}    Free space on partition /vicepc
+    ${free_space}=    String.Get Regexp Matches    ${output}    (\\d+) K blocks out of total (\\d+)
+    Should Be True    int(${free_space}[0]) < int(${freespace}[1])    server3: Partition vicepc disk space is running out!
