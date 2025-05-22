@@ -2,6 +2,7 @@
 # Copyright (c) 2014-2025 Sine Nomine Associates
 # See LICENSE
 
+
 *** Settings ***
 Documentation    Health check suite has test cases that will ensure that an openafs environment is properly
 ...    configured before the main openafs test cases are executed.
