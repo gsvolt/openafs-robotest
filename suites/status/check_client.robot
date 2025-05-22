@@ -429,31 +429,31 @@ Clients And Servers Have Diskspace
     Log Many    ${rc}    ${output}
     Should Be Equal As Integers    ${rc}    0
     ${free_space}=    String.Get Regexp Matches    ${output}    (\\d+)% /    1
-    Should Be True    ${free_space} < 80    client1 is about to run out of space
+    Should Be True    int(${free_space}[0]) < 80    client1 is about to run out of space
 
     ${rc}    ${output}=    client2.Run And Return Rc And Output    df -h | grep -e [/]$
     Log Many    ${rc}    ${output}
     Should Be Equal As Integers    ${rc}    0
     ${free_space}=    String.Get Regexp Matches    ${output}    (\\d+)% /    1
-    Should Be True    ${free_space} < 80    client2 is about to run out of space
+    Should Be True    int(${free_space}[0]) < 80    client2 is about to run out of space
 
     ${rc}    ${output}=    server1.Run And Return Rc And Output    df -h | grep -e [/]$
     Log Many    ${rc}    ${output}
     Should Be Equal As Integers    ${rc}    0
     ${free_space}=    String.Get Regexp Matches    ${output}    (\\d+)% /    1
-    Should Be True    ${free_space} < 80    server1 is about to run out of space
+    Should Be True    int(${free_space}[0]) < 80    server1 is about to run out of space
 
     ${rc}    ${output}=    server2.Run And Return Rc And Output    df -h | grep -e [/]$
     Log Many    ${rc}    ${output}
     Should Be Equal As Integers    ${rc}    0
     ${free_space}=    String.Get Regexp Matches    ${output}    (\\d+)% /    1
-    Should Be True    ${free_space} < 80    server2 is about to run out of space
+    Should Be True    int(${free_space}[0]) < 80    server2 is about to run out of space
 
     ${rc}    ${output}=    server3.Run And Return Rc And Output    df -h | grep -e [/]$
     Log Many    ${rc}    ${output}
     Should Be Equal As Integers    ${rc}    0
     ${free_space}=    String.Get Regexp Matches    ${output}    (\\d+)% /    1
-    Should Be True    ${free_space} < 80    server3 is about to run out of space
+    Should Be True    int(${free_space}[0]) < 80    server3 is about to run out of space
 
 Clients Can Get Current Cell
     [Documentation]    Clients Can Get Current Cell
