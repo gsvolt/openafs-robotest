@@ -1,11 +1,13 @@
 *** Settings ***
+Documentation    Health check suite has test cases that will ensure that an openafs environment is properly
+...    configured before the main openafs test cases are executed.
 Variables    Variables.py
+Library    DateTime
 Library    Remote    http://server1.${DOMAIN_NAME}:${PORT}    AS   server1
 Library    Remote    http://server2.${DOMAIN_NAME}:${PORT}    AS   server2
 Library    Remote    http://server3.${DOMAIN_NAME}:${PORT}    AS   server3
 Library    Remote    http://client1.${DOMAIN_NAME}:${PORT}    AS   client1
 Library    Remote    http://client2.${DOMAIN_NAME}:${PORT}    AS   client2
-Library    DateTime
 Library    String
 
 
@@ -186,7 +188,11 @@ Cell volumes exist in vldb
     Log    ${rc}
     Log    ${output}
     Should Be Equal As Integers    ${rc}    0
-    Should Contain Any    ${output}    server server3.example.com partition /vicepa RW Site    server server3.example.com partition /vicepa RO Site    server server2.example.com partition /vicepa RO Site    server server1.example.com partition /vicepa RO Site    root.afs    root.cell    number of sites -> 4
+    Should Contain Any    ${output}    server server3.example.com partition /vicepa RW Site
+    ...    server server3.example.com partition /vicepa RO Site
+    ...    server server2.example.com partition /vicepa RO Site
+    ...    server server1.example.com partition /vicepa RO Site
+    ...    root.afs    root.cell    number of sites -> 4
 
     ${rc}    ${output}=    server1.Run And Return Rc And Output    vos listvol -server localhost
     Log    ${rc}
@@ -198,13 +204,21 @@ Cell volumes exist in vldb
     Log    ${rc}
     Log    ${output}
     Should Be Equal As Integers    ${rc}    0
-    Should Contain Any    ${output}    server server3.example.com partition /vicepa RW Site    server server3.example.com partition /vicepa RO Site    server server2.example.com partition /vicepa RO Site    server server1.example.com partition /vicepa RO Site    root.afs    root.cell    number of sites -> 4
+    Should Contain Any    ${output}    server server3.example.com partition /vicepa RW Site
+    ...    server server3.example.com partition /vicepa RO Site
+    ...    server server2.example.com partition /vicepa RO Site
+    ...    server server1.example.com partition /vicepa RO Site
+    ...    root.afs    root.cell    number of sites -> 4
 
     ${rc}    ${output}=    server3.Run And Return Rc And Output    vos listvldb
     Log    ${rc}
     Log    ${output}
     Should Be Equal As Integers    ${rc}    0
-    Should Contain Any    ${output}    server server3.example.com partition /vicepa RW Site    server server3.example.com partition /vicepa RO Site    server server2.example.com partition /vicepa RO Site    server server1.example.com partition /vicepa RO Site    root.afs    root.cell    number of sites -> 4
+    Should Contain Any    ${output}    server server3.example.com partition /vicepa RW Site
+    ...    server server3.example.com partition /vicepa RO Site
+    ...    server server2.example.com partition /vicepa RO Site
+    ...    server server1.example.com partition /vicepa RO Site
+    ...    root.afs    root.cell    number of sites -> 4
 
 Partitions have available diskspace
     [Documentation]    Partitions have available diskspace
@@ -216,70 +230,82 @@ Partitions have available diskspace
     Should Not Contain    ${output}    partition /vicepa does not exist on the server
     Should Contain    ${output}    Free space on partition /vicepa
     ${free_space}=    String.Get Regexp Matches    ${output}    (\\d+) K blocks out of total (\\d+)    1    2
-    Should Be True    int(${free_space}[0][0]) < int(${free_space}[0][1])    server1: Partition vicepa disk space is running out!
+    Should Be True    int(${free_space}[0][0]) < int(${free_space}[0][1])
+    ...    server1: Partition vicepa disk space is running out!
 
     ${rc}    ${output}=    server1.Run And Return Rc And Output    vos partinfo server1.example.com /vicepb
     Should Be Equal As Integers    ${rc}    0
     Should Not Contain    ${output}    partition /vicepb does not exist on the server
     Should Contain    ${output}    Free space on partition /vicepb
     ${free_space}=    String.Get Regexp Matches    ${output}    (\\d+) K blocks out of total (\\d+)    2
-    Should Be True    int(${free_space}[0][0]) < int(${free_space}[0][1])    server1: Partition vicepb disk space is running out!
+    Should Be True    int(${free_space}[0][0]) < int(${free_space}[0][1])
+    ...    server1: Partition vicepb disk space is running out!
 
     ${rc}    ${output}=    server1.Run And Return Rc And Output    vos partinfo server1.example.com /vicepc
     Should Be Equal As Integers    ${rc}    0
     Should Not Contain    ${output}    partition /vicepc does not exist on the server
     Should Contain    ${output}    Free space on partition /vicepc
     ${free_space}=    String.Get Regexp Matches    ${output}    (\\d+) K blocks out of total (\\d+)    2
-    Should Be True    int(${free_space}[0][0]) < int(${free_space}[0][1])    server1: Partition vicepc disk space is running out!
+    Should Be True    int(${free_space}[0][0]) < int(${free_space}[0][1])
+    ...    server1: Partition vicepc disk space is running out!
 
     ${rc}    ${output}=    server1.Run And Return Rc And Output    vos partinfo server2.example.com /vicepa
     Should Be Equal As Integers    ${rc}    0
     Should Not Contain    ${output}    partition /vicepa does not exist on the server
     Should Contain    ${output}    Free space on partition /vicepa
     ${free_space}=    String.Get Regexp Matches    ${output}    (\\d+) K blocks out of total (\\d+)    2
-    Should Be True    int(${free_space}[0][0]) < int(${free_space}[0][1])    server2: Partition vicepa disk space is running out!
+    Should Be True    int(${free_space}[0][0]) < int(${free_space}[0][1])
+    ...    server2: Partition vicepa disk space is running out!
 
     ${rc}    ${output}=    server1.Run And Return Rc And Output    vos partinfo server2.example.com /vicepb
     Should Be Equal As Integers    ${rc}    0
     Should Not Contain    ${output}    partition /vicepb does not exist on the server
     Should Contain    ${output}    Free space on partition /vicepb
     ${free_space}=    String.Get Regexp Matches    ${output}    (\\d+) K blocks out of total (\\d+)    2
-    Should Be True    int(${free_space}[0][0]) < int(${free_space}[0][1])    server2: Partition vicepb disk space is running out!
+    Should Be True    int(${free_space}[0][0]) < int(${free_space}[0][1])
+    ...    server2: Partition vicepb disk space is running out!
 
     ${rc}    ${output}=    server1.Run And Return Rc And Output    vos partinfo server2.example.com /vicepc
     Should Be Equal As Integers    ${rc}    0
     Should Not Contain    ${output}    partition /vicepc does not exist on the server
     Should Contain    ${output}    Free space on partition /vicepc
     ${free_space}=    String.Get Regexp Matches    ${output}    (\\d+) K blocks out of total (\\d+)    2
-    Should Be True    int(${free_space}[0][0]) < int(${free_space}[0][1])    server2: Partition vicepc disk space is running out!
+    Should Be True    int(${free_space}[0][0]) < int(${free_space}[0][1])
+    ...    server2: Partition vicepc disk space is running out!
 
     ${rc}    ${output}=    server1.Run And Return Rc And Output    vos partinfo server3.example.com /vicepa
     Should Be Equal As Integers    ${rc}    0
     Should Not Contain    ${output}    partition /vicepa does not exist on the server
     Should Contain    ${output}    Free space on partition /vicepa
     ${free_space}=    String.Get Regexp Matches    ${output}    (\\d+) K blocks out of total (\\d+)    2
-    Should Be True    int(${free_space}[0][0]) < int(${free_space}[0][1])    server3: Partition vicepa disk space is running out!
+    Should Be True    int(${free_space}[0][0]) < int(${free_space}[0][1])
+    ...    server3: Partition vicepa disk space is running out!
 
     ${rc}    ${output}=    server1.Run And Return Rc And Output    vos partinfo server3.example.com /vicepb
     Should Be Equal As Integers    ${rc}    0
     Should Not Contain    ${output}    partition /vicepb does not exist on the server
     Should Contain    ${output}    Free space on partition /vicepb
     ${free_space}=    String.Get Regexp Matches    ${output}    (\\d+) K blocks out of total (\\d+)    2
-    Should Be True    int(${free_space}[0][0]) < int(${free_space}[0][1])    server3: Partition vicepb disk space is running out!
+    Should Be True    int(${free_space}[0][0]) < int(${free_space}[0][1])
+    ...    server3: Partition vicepb disk space is running out!
 
     ${rc}    ${output}=    server1.Run And Return Rc And Output    vos partinfo server3.example.com /vicepc
     Should Be Equal As Integers    ${rc}    0
     Should Not Contain    ${output}    partition /vicepc does not exist on the server
     Should Contain    ${output}    Free space on partition /vicepc
     ${free_space}=    String.Get Regexp Matches    ${output}    (\\d+) K blocks out of total (\\d+)    2
-    Should Be True    int(${free_space}[0][0]) < int(${free_space}[0][1])    server3: Partition vicepc disk space is running out!
+    Should Be True    int(${free_space}[0][0]) < int(${free_space}[0][1])
+    ...    server3: Partition vicepc disk space is running out!
 
 Cache manager health check
     [Documentation]    Cache manager health check
     ${rc}    ${output}=    client1.Run And Return Rc And Output    cmdebug -s client1 -port 7001 -long
     Log    ${output}
     Should Be Equal As Integers    ${rc}    0
-    Should Contain Any    ${output}    Lock example.com status: (none_waiting)    for 192.536870912.1.1 [example.com]    for 192.536870912.4.3 [example.com]    for 192.536870912.2.2 [example.com]    for 192.536870915.2.2 [example.com]    for 192.536870918.1.1 [example.com]    for 192.536870915.1.1 [example.com]
+    Should Contain Any    ${output}    Lock example.com status: (none_waiting)    for 192.536870912.1.1 [example.com]
+    ...    for 192.536870912.4.3 [example.com]    for 192.536870912.2.2 [example.com]
+    ...    for 192.536870915.2.2 [example.com]    for 192.536870918.1.1 [example.com]
+    ...    for 192.536870915.1.1 [example.com]
 
     ${rc}    ${output}=    client2.Run And Return Rc And Output    cmdebug -s client2 -port 7001 -long
     Should Be Equal As Integers    ${rc}    0
@@ -319,14 +345,14 @@ Mount point exists for AFS
     ...
     ...    Use mount command to verify if AFS mount point exists
     ${rc}    ${output}=    client1.Run And Return Rc And Output    mount
-    Log ${rc}
-    Log ${output}
+    Log    ${rc}
+    Log    ${output}
     Should Be Equal As Integers    ${rc}    0
     Should Contain    ${output}    AFS on /afs type afs (rw,relatime)
 
     ${rc}    ${output}=    client2.Run And Return Rc And Output    mount
-    Log ${rc}
-    Log ${output}
+    Log    ${rc}
+    Log    ${output}
     Should Be Equal As Integers    ${rc}    0
     Should Contain    ${output}    AFS on /afs type afs (rw,relatime)
 
