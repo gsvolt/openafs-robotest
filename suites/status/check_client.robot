@@ -404,9 +404,9 @@ Client systems can get directory listing
 
 Server nodes are running kerberos server
     [Documentation]    Server nodes are running kerberos server
-    ${rc}    ${output}=    server1.Run And Return Rc And Output    systemctl status krb5kdc.server
+    ${rc}    ${output}=    server1.Run And Return Rc And Output    systemctl status krb5kdc.service
     Should Be Equal As Integers    ${rc}    0
     Should Contain Any    ${output}    Active: active (running)    Loaded: loaded    enabled
-    ${rc}    ${output}=    server1.Run And Return Rc And Output    systemctl status krb5kdc.server
+    ${rc}    ${output}=    server1.Run And Return Rc And Output    systemctl status krb5kdc.service
     Should Be Equal As Integers    ${rc}    0
     Should Contain Any    ${output}    Active: active (running)    Loaded: loaded    enabled
