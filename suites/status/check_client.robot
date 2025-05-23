@@ -1,3 +1,7 @@
+*** Comments ***
+# Copyright (c) 2014-2025 Sine Nomine Associates
+# See LICENSE
+
 *** Settings ***
 Documentation    Health check suite has test cases that will ensure that an openafs environment is properly
 ...    configured before the main openafs test cases are executed.
@@ -22,8 +26,10 @@ Ping All Servers
 
 Clients Can Run Bos Status
     [Documentation]    Clients Can Run Bos Status
+    ...
     ...    Run bos status (unauthenticated) on both clients and ensure
     ...    openafs servers are running.
+
     ${rc}    ${output}=    client1.Run And Return Rc And Output    bos status server1
     Log    ${rc}
     Log    ${output}
@@ -79,30 +85,21 @@ Clients Can Run Bos Status
     ...    Auxiliary status is: file server running.
 
 Clients Can Run Cache Manager
-    [Documentation]    Cache Manager Running
+    [Documentation]    Clients Can Run Cache Manager
+    ...
+    ...    Run fs checkservers to check whether all servers are running.
+
     ${rc}    ${output}=    client1.Run And Return Rc And Output    fs checkservers
     Log    ${rc}
     Log    ${output}
     Should Be Equal As Integers    ${rc}    0
     Should Contain    ${output}    All servers are running
 
-    ${rc}    ${output}=    client1.Run And Return Rc And Output    mount | grep afs
-    Log    ${rc}
-    Log    ${output}
-    Should Be Equal As Integers    ${rc}    0
-    Should Contain    ${output}    AFS on /afs type afs
-
     ${rc}    ${output}=    client2.Run And Return Rc And Output    fs checkservers
     Log    ${rc}
     Log    ${output}
     Should Be Equal As Integers    ${rc}    0
     Should Contain    ${output}    All servers are running
-
-    ${rc}    ${output}=    client2.Run And Return Rc And Output    mount | grep afs
-    Log    ${rc}
-    Log    ${output}
-    Should Be Equal As Integers    ${rc}    0
-    Should Contain    ${output}    AFS on /afs type afs
 
 Afs Client Running
     [Documentation]    Afs Client Running
@@ -138,8 +135,8 @@ Afs Server Running
     Should Be Equal As Integers    ${rc}    0
     Should Contain    ${output}    active
 
-Servers Have No Skew In Their Time
-    [Documentation]    Servers have no skew in their time
+Servers Have No Skew In Their Time And Have Quorum
+    [Documentation]    Servers have no skew in their time and have quorum
     ...
     ...    There is a chance that server clocks in use can go out sync with each other
     ...    This test calls udebug utility and checks for the time differential value.
@@ -181,8 +178,11 @@ Servers Have No Skew In Their Time
     Log    int(${time_diff}[0])
     Should Be True    int(${time_diff}[0]) <= 10    time difference ${time_diff} is more than 10 seconds
 
-Cell volumes exist in vldb
+Cell Volumes Exist In Vldb
     [Documentation]    Cell volumes exist in vldb
+    ...
+    ...    Calls vos listvldb and vos listvol -server localhost to ensure that
+    ...    cell volumes exist in vldb.
 
     ${rc}    ${output}=    server1.Run And Return Rc And Output    vos listvldb
     Log    ${rc}
@@ -220,8 +220,9 @@ Cell volumes exist in vldb
     ...    server server1.example.com partition /vicepa RO Site
     ...    root.afs    root.cell    number of sites -> 4
 
-Partitions have available diskspace
-    [Documentation]    Partitions have available diskspace
+Server Partitions Have Available Diskspace
+    [Documentation]    Server Partitions Have Available Diskspace
+    ...
     ...   For each of the three servers, check whether vicepa, vicepb and vicepc
     ...   partitions have adequate amount of space.
 
@@ -297,8 +298,11 @@ Partitions have available diskspace
     Should Be True    int(${free_space}[0][0]) < int(${free_space}[0][1])
     ...    server3: Partition vicepc disk space is running out!
 
-Cache manager health check
-    [Documentation]    Cache manager health check
+Cache Manager Health Check
+    [Documentation]    Cache Manager Health Check
+    ...
+    ...    Runs cmdebug to determine if cache manager is working
+
     ${rc}    ${output}=    client1.Run And Return Rc And Output    cmdebug -s client1 -port 7001 -long
     Log    ${output}
     Should Be Equal As Integers    ${rc}    0
@@ -312,38 +316,61 @@ Cache manager health check
     Log    ${output}
     Should Contain Any    ${output}    Lock example.com status: (none_waiting)
 
-Rxdebug executes on client systems
-    [Documentation]    Rxdebug executes on client systems
+Clients Can Execute Rxdebug Locally
+    [Documentation]    Clients Can Execute Rxdebug Locally
+    ...
+    ...    Runs rxdebug with server name localhost to check if the command succeeds.
+
     ${rc}    ${output}=    client1.Run And Return Rc And Output    rxdebug -servers localhost -port 7001
-    Log    ${output}
+    Log Many    ${rc}    ${output}
     Should Be Equal As Integers    ${rc}    0
     Should Contain Any    ${output}    Free packets:    Done.
 
     ${rc}    ${output}=    client2.Run And Return Rc And Output    rxdebug -servers localhost -port 7001
-    Log    ${output}
+    Log Many    ${rc}    ${output}
     Should Be Equal As Integers    ${rc}    0
     Should Contain Any    ${output}    Free packets:    Done.
 
-Client systems can get the current cell
-    [Documentation]    Client systems can get the current cell
-    ...    Use fs wscell to get the current cell
+Clients Can Reach Servers With Rxdebug
+    [Documentation]    Clients Can Reach Servers With Rxdebug
+    ...
+    ...    Runs rxdebug with server names to check if the command succeeds.
 
-    ${rc}    ${output}=    client1.Run And Return Rc And Output    fs wscell
-    Log    ${rc}
-    Log    ${output}
+    ${rc}    ${output}=    client1.Run And Return Rc And Output    rxdebug -servers server1 -port 7003
+    Log Many    ${rc}    ${output}
     Should Be Equal As Integers    ${rc}    0
-    Should Contain    ${output}    This workstation belongs to cell 'example.com'
+    Should Contain Any    ${output}    Free packets:    Done.
 
-    ${rc}    ${output}=    client1.Run And Return Rc And Output    fs wscell
-    Log    ${rc}
-    Log    ${output}
+    ${rc}    ${output}=    client1.Run And Return Rc And Output    rxdebug -servers server2 -port 7003
+    Log Many    ${rc}    ${output}
     Should Be Equal As Integers    ${rc}    0
-    Should Contain    ${output}    This workstation belongs to cell 'example.com'
+    Should Contain Any    ${output}    Free packets:    Done.
 
-Mount point exists for AFS
+    ${rc}    ${output}=    client1.Run And Return Rc And Output    rxdebug -servers server3 -port 7003
+    Log Many    ${rc}    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain Any    ${output}    Free packets:    Done.
+
+    ${rc}    ${output}=    client2.Run And Return Rc And Output    rxdebug -servers server1 -port 7003
+    Log Many    ${rc}    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain Any    ${output}    Free packets:    Done.
+
+    ${rc}    ${output}=    client2.Run And Return Rc And Output    rxdebug -servers server2 -port 7003
+    Log Many    ${rc}    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain Any    ${output}    Free packets:    Done.
+
+    ${rc}    ${output}=    client2.Run And Return Rc And Output    rxdebug -servers server3 -port 7003
+    Log Many    ${rc}    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain Any    ${output}    Free packets:    Done.
+
+Mount Point Exists For AFS
     [Documentation]    Mount point exists for AFS
     ...
     ...    Use mount command to verify if AFS mount point exists
+
     ${rc}    ${output}=    client1.Run And Return Rc And Output    mount
     Log    ${rc}
     Log    ${output}
@@ -356,10 +383,98 @@ Mount point exists for AFS
     Should Be Equal As Integers    ${rc}    0
     Should Contain    ${output}    AFS on /afs type afs (rw,relatime)
 
-Network check
-    [Documentation]    Network check
+Kernel Module Loaded
+    [Documentation]    Kernel Module Loaded
+    ...
+    ...    Use lsmod to check if openafs kernel module is loaded.
+
+    ${rc}    ${output}=    client1.Run And Return Rc And Output    lsmod | grep afs
+    Log Many    ${rc}    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain    ${output}    openafs
+
+    ${rc}    ${output}=    client2.Run And Return Rc And Output    lsmod | grep afs
+    Log Many    ${rc}    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain    ${output}    openafs
+
+Clients Can Get Afs Directory Listing
+    [Documentation]    Clients Can Get Afs Directory Listing
+    ...
+    ...    Calls ls command to get a directory listing from /afs/example.com
+
+    ${rc}    ${output}=    client2.Run And Return Rc And Output    ls /afs/example.com/
+    Log    ${output}
+    Should Be Equal As Integers    ${rc}    0
+
+Servers Are Running Kerberos Server
+    [Documentation]    Servers Are Running Kerberos Server
+    ...
+    ...    Check status of krb5kdc service and make sure it is active and running
+
+    ${rc}    ${output}=    server1.Run And Return Rc And Output    systemctl status krb5kdc.service
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain Any    ${output}    Active: active (running)    Loaded: loaded    enabled
+    ${rc}    ${output}=    server1.Run And Return Rc And Output    systemctl status krb5kdc.service
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain Any    ${output}    Active: active (running)    Loaded: loaded    enabled
+
+Clients And Servers Have Diskspace
+    [Documentation]    Clients And Servers Have Diskspace
+    ...
+    ...    Calls df command to check how much disk space remains
+
+    ${rc}    ${output}=    client1.Run And Return Rc And Output    df -h | grep -e [/]$
+    Log Many    ${rc}    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    ${free_space}=    String.Get Regexp Matches    ${output}    (\\d+)% /    1
+    Should Be True    ${free_space} < 80    client1 is about to run out of space
+
+    ${rc}    ${output}=    client2.Run And Return Rc And Output    df -h | grep -e [/]$
+    Log Many    ${rc}    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    ${free_space}=    String.Get Regexp Matches    ${output}    (\\d+)% /    1
+    Should Be True    ${free_space} < 80    client2 is about to run out of space
+
+    ${rc}    ${output}=    server1.Run And Return Rc And Output    df -h | grep -e [/]$
+    Log Many    ${rc}    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    ${free_space}=    String.Get Regexp Matches    ${output}    (\\d+)% /    1
+    Should Be True    ${free_space} < 80    server1 is about to run out of space
+
+    ${rc}    ${output}=    server2.Run And Return Rc And Output    df -h | grep -e [/]$
+    Log Many    ${rc}    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    ${free_space}=    String.Get Regexp Matches    ${output}    (\\d+)% /    1
+    Should Be True    ${free_space} < 80    server2 is about to run out of space
+
+    ${rc}    ${output}=    server3.Run And Return Rc And Output    df -h | grep -e [/]$
+    Log Many    ${rc}    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    ${free_space}=    String.Get Regexp Matches    ${output}    (\\d+)% /    1
+    Should Be True    ${free_space} < 80    server3 is about to run out of space
+
+Clients Can Get Current Cell
+    [Documentation]    Clients Can Get Current Cell
+    ...
+    ...    Uses fs command to check whether client can get current cell
+
+    ${rc}    ${output}=    client1.Run And Return Rc And Output    fs wscell
+    Log Many    ${rc}    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain    ${output}    This workstation belongs to cell 'example.com'
+
+    ${rc}    ${output}=    client2.Run And Return Rc And Output    fs wscell
+    Log Many    ${rc}    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain    ${output}    This workstation belongs to cell 'example.com'
+
+Clients And Servers Can Access Internet
+    [Documentation]    Clients And Servers Can Access Internet
     ...
     ...    Runs ping google.com and checks for 0% packet loss for all servers
+    ...    (Note: Last test in this suite)
+
     ${rc}    ${output}=    client1.Run And Return Rc And Output    ping -c4 google.com
     Log Many    ${rc}    ${output}
     Should Be Equal As Integers    ${rc}    0
@@ -384,29 +499,3 @@ Network check
     Log Many    ${rc}    ${output}
     Should Be Equal As Integers    ${rc}    0
     Should Contain    ${output}    0% packet loss
-
-Kernel module loaded
-    [Documentation]    Kernel module loaded
-    ${rc}    ${output}=    client1.Run And Return Rc And Output    lsmod | grep afs
-    Log Many    ${rc}    ${output}
-    Should Be Equal As Integers    ${rc}    0
-    Should Contain    ${output}    openafs
-    ${rc}    ${output}=    client2.Run And Return Rc And Output    lsmod | grep afs
-    Log Many    ${rc}    ${output}
-    Should Be Equal As Integers    ${rc}    0
-    Should Contain    ${output}    openafs
-
-Client systems can get directory listing
-    [Documentation]    Client systems can get directory listing
-    ${rc}    ${output}=    client2.Run And Return Rc And Output    ls /afs/example.com/
-    Log    ${output}
-    Should Be Equal As Integers    ${rc}    0
-
-Server nodes are running kerberos server
-    [Documentation]    Server nodes are running kerberos server
-    ${rc}    ${output}=    server1.Run And Return Rc And Output    systemctl status krb5kdc.service
-    Should Be Equal As Integers    ${rc}    0
-    Should Contain Any    ${output}    Active: active (running)    Loaded: loaded    enabled
-    ${rc}    ${output}=    server1.Run And Return Rc And Output    systemctl status krb5kdc.service
-    Should Be Equal As Integers    ${rc}    0
-    Should Contain Any    ${output}    Active: active (running)    Loaded: loaded    enabled
