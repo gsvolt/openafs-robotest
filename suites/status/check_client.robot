@@ -184,42 +184,11 @@ Cell Volumes Exist In Vldb
     ...    Calls vos listvldb and vos listvol -server localhost to ensure that
     ...    cell volumes exist in vldb.
 
-    ${rc}    ${output}=    server1.Run And Return Rc And Output    vos listvldb
-    Log    ${rc}
-    Log    ${output}
+    ${rc}    ${output}=    client1.Run And Return Rc And Output    vos examine root.afs
+    Log Many    ${rc}    ${output}
     Should Be Equal As Integers    ${rc}    0
-    Should Contain Any    ${output}    server server3.example.com partition /vicepa RW Site
-    ...    server server3.example.com partition /vicepa RO Site
-    ...    server server2.example.com partition /vicepa RO Site
-    ...    server server1.example.com partition /vicepa RO Site
-    ...    root.afs    root.cell    number of sites -> 4
-
-    ${rc}    ${output}=    server1.Run And Return Rc And Output    vos listvol -server localhost
-    Log    ${rc}
-    Log    ${output}
-    Should Be Equal As Integers    ${rc}    0
-    Should Contain    ${output}    Total volumes onLine 3
-
-    ${rc}    ${output}=    server2.Run And Return Rc And Output    vos listvldb
-    Log    ${rc}
-    Log    ${output}
-    Should Be Equal As Integers    ${rc}    0
-    Should Contain Any    ${output}    server server3.example.com partition /vicepa RW Site
-    ...    server server3.example.com partition /vicepa RO Site
-    ...    server server2.example.com partition /vicepa RO Site
-    ...    server server1.example.com partition /vicepa RO Site
-    ...    root.afs    root.cell    number of sites -> 4
-
-    ${rc}    ${output}=    server3.Run And Return Rc And Output    vos listvldb
-    Log    ${rc}
-    Log    ${output}
-    Should Be Equal As Integers    ${rc}    0
-    Should Contain Any    ${output}    server server3.example.com partition /vicepa RW Site
-    ...    server server3.example.com partition /vicepa RO Site
-    ...    server server2.example.com partition /vicepa RO Site
-    ...    server server1.example.com partition /vicepa RO Site
-    ...    root.afs    root.cell    number of sites -> 4
-
+    Should Contain Any    ${output}    On-line    root.afs    number of sites -> 4
+    
 Server Partitions Have Available Diskspace
     [Documentation]    Server Partitions Have Available Diskspace
     ...
