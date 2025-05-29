@@ -189,7 +189,7 @@ Cell Volumes Exist In Vldb
     Log Many    ${rc}    ${output}
     Should Be Equal As Integers    ${rc}    0
     Should Contain Any    ${output}    On-line    root.afs    number of sites -> 4
-    
+
 Server Partitions Have Available Diskspace
     [Documentation]    Server Partitions Have Available Diskspace
     ...
