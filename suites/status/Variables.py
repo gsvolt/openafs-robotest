@@ -1,8 +1,8 @@
-# REMOTE_SERVER1 = "server1"
-# REMOTE_SERVER2 = "server2"
-# REMOTE_SERVER3 = "server3"
-# REMOTE_CLIENT1 = "client1"
-# REMOTE_CLIENT2 = "client2"
+REMOTE_SERVER1 = "server1"
+REMOTE_SERVER2 = "server2"
+REMOTE_SERVER3 = "server3"
+REMOTE_CLIENT1 = "client1"
+REMOTE_CLIENT2 = "client2"
 DOMAIN_NAME = "example.com"
 PORT = 8270
 # REMOTE_SERVER1_URL = f"http://{REMOTE_SERVER1}.{HOSTNAME}:{PORT}"
