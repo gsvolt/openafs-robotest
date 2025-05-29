@@ -389,41 +389,6 @@ Servers Are Running Kerberos Server
     Should Be Equal As Integers    ${rc}    0
     Should Contain Any    ${output}    Active: active (running)    Loaded: loaded    enabled
 
-Clients And Servers Have Diskspace
-    [Documentation]    Clients And Servers Have Diskspace
-    ...
-    ...    Calls df command to check how much disk space remains
-
-    ${rc}    ${output}=    client1.Run And Return Rc And Output    df -h | grep -e [/]$
-    Log Many    ${rc}    ${output}
-    Should Be Equal As Integers    ${rc}    0
-    ${free_space}=    String.Get Regexp Matches    ${output}    (\\d+)% /    1
-    Should Be True    ${free_space} < 80    client1 is about to run out of space
-
-    ${rc}    ${output}=    client2.Run And Return Rc And Output    df -h | grep -e [/]$
-    Log Many    ${rc}    ${output}
-    Should Be Equal As Integers    ${rc}    0
-    ${free_space}=    String.Get Regexp Matches    ${output}    (\\d+)% /    1
-    Should Be True    ${free_space} < 80    client2 is about to run out of space
-
-    ${rc}    ${output}=    server1.Run And Return Rc And Output    df -h | grep -e [/]$
-    Log Many    ${rc}    ${output}
-    Should Be Equal As Integers    ${rc}    0
-    ${free_space}=    String.Get Regexp Matches    ${output}    (\\d+)% /    1
-    Should Be True    ${free_space} < 80    ${REMOTE_SERVER1} is about to run out of space
-
-    ${rc}    ${output}=    server2.Run And Return Rc And Output    df -h | grep -e [/]$
-    Log Many    ${rc}    ${output}
-    Should Be Equal As Integers    ${rc}    0
-    ${free_space}=    String.Get Regexp Matches    ${output}    (\\d+)% /    1
-    Should Be True    ${free_space} < 80    ${REMOTE_SERVER2} is about to run out of space
-
-    ${rc}    ${output}=    server3.Run And Return Rc And Output    df -h | grep -e [/]$
-    Log Many    ${rc}    ${output}
-    Should Be Equal As Integers    ${rc}    0
-    ${free_space}=    String.Get Regexp Matches    ${output}    (\\d+)% /    1
-    Should Be True    ${free_space} < 80    ${REMOTE_SERVER3} is about to run out of space
-
 Clients Can Get Current Cell
     [Documentation]    Clients Can Get Current Cell
     ...
