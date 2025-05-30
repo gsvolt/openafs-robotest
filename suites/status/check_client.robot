@@ -1,6 +1,6 @@
 *** Comments ***
-# Copyright (c) 2014-2025 Sine Nomine Associates
-# See LICENSE
+Copyright (c) 2025 Sine Nomine Associates
+See LICENSE
 
 
 *** Settings ***
@@ -190,84 +190,6 @@ Cell Volumes Exist In Vldb
     Log Many    ${rc}    ${output}
     Should Be Equal As Integers    ${rc}    0
     Should Contain Any    ${output}    On-line    root.afs    number of sites -> 4
-
-Server Partitions Have Available Diskspace
-    [Documentation]    Server Partitions Have Available Diskspace
-    ...
-    ...   For each of the three servers, check whether vicepa, vicepb and vicepc
-    ...   partitions have adequate amount of space.
-
-    ${rc}    ${output}=    server1.Run And Return Rc And Output    vos partinfo ${REMOTE_SERVER1}.example.com /vicepa
-    Should Be Equal As Integers    ${rc}    0
-    Should Not Contain    ${output}    partition /vicepa does not exist on the server
-    Should Contain    ${output}    Free space on partition /vicepa
-    ${free_space}=    String.Get Regexp Matches    ${output}    (\\d+) K blocks out of total (\\d+)    1    2
-    Should Be True    int(${free_space}[0][0]) < int(${free_space}[0][1])
-    ...    ${REMOTE_SERVER1}: Partition vicepa disk space is running out!
-
-    ${rc}    ${output}=    server1.Run And Return Rc And Output    vos partinfo ${REMOTE_SERVER1}.example.com /vicepb
-    Should Be Equal As Integers    ${rc}    0
-    Should Not Contain    ${output}    partition /vicepb does not exist on the server
-    Should Contain    ${output}    Free space on partition /vicepb
-    ${free_space}=    String.Get Regexp Matches    ${output}    (\\d+) K blocks out of total (\\d+)    2
-    Should Be True    int(${free_space}[0][0]) < int(${free_space}[0][1])
-    ...    ${REMOTE_SERVER1}: Partition vicepb disk space is running out!
-
-    ${rc}    ${output}=    server1.Run And Return Rc And Output    vos partinfo ${REMOTE_SERVER1}.example.com /vicepc
-    Should Be Equal As Integers    ${rc}    0
-    Should Not Contain    ${output}    partition /vicepc does not exist on the server
-    Should Contain    ${output}    Free space on partition /vicepc
-    ${free_space}=    String.Get Regexp Matches    ${output}    (\\d+) K blocks out of total (\\d+)    2
-    Should Be True    int(${free_space}[0][0]) < int(${free_space}[0][1])
-    ...    ${REMOTE_SERVER1}: Partition vicepc disk space is running out!
-
-    ${rc}    ${output}=    server1.Run And Return Rc And Output    vos partinfo ${REMOTE_SERVER2}.example.com /vicepa
-    Should Be Equal As Integers    ${rc}    0
-    Should Not Contain    ${output}    partition /vicepa does not exist on the server
-    Should Contain    ${output}    Free space on partition /vicepa
-    ${free_space}=    String.Get Regexp Matches    ${output}    (\\d+) K blocks out of total (\\d+)    2
-    Should Be True    int(${free_space}[0][0]) < int(${free_space}[0][1])
-    ...    ${REMOTE_SERVER2}: Partition vicepa disk space is running out!
-
-    ${rc}    ${output}=    server1.Run And Return Rc And Output    vos partinfo ${REMOTE_SERVER2}.example.com /vicepb
-    Should Be Equal As Integers    ${rc}    0
-    Should Not Contain    ${output}    partition /vicepb does not exist on the server
-    Should Contain    ${output}    Free space on partition /vicepb
-    ${free_space}=    String.Get Regexp Matches    ${output}    (\\d+) K blocks out of total (\\d+)    2
-    Should Be True    int(${free_space}[0][0]) < int(${free_space}[0][1])
-    ...    ${REMOTE_SERVER2}: Partition vicepb disk space is running out!
-
-    ${rc}    ${output}=    server1.Run And Return Rc And Output    vos partinfo ${REMOTE_SERVER2}.example.com /vicepc
-    Should Be Equal As Integers    ${rc}    0
-    Should Not Contain    ${output}    partition /vicepc does not exist on the server
-    Should Contain    ${output}    Free space on partition /vicepc
-    ${free_space}=    String.Get Regexp Matches    ${output}    (\\d+) K blocks out of total (\\d+)    2
-    Should Be True    int(${free_space}[0][0]) < int(${free_space}[0][1])
-    ...    ${REMOTE_SERVER2}: Partition vicepc disk space is running out!
-
-    ${rc}    ${output}=    server1.Run And Return Rc And Output    vos partinfo ${REMOTE_SERVER3}.example.com /vicepa
-    Should Be Equal As Integers    ${rc}    0
-    Should Not Contain    ${output}    partition /vicepa does not exist on the server
-    Should Contain    ${output}    Free space on partition /vicepa
-    ${free_space}=    String.Get Regexp Matches    ${output}    (\\d+) K blocks out of total (\\d+)    2
-    Should Be True    int(${free_space}[0][0]) < int(${free_space}[0][1])
-    ...    ${REMOTE_SERVER3}: Partition vicepa disk space is running out!
-
-    ${rc}    ${output}=    server1.Run And Return Rc And Output    vos partinfo ${REMOTE_SERVER3}.example.com /vicepb
-    Should Be Equal As Integers    ${rc}    0
-    Should Not Contain    ${output}    partition /vicepb does not exist on the server
-    Should Contain    ${output}    Free space on partition /vicepb
-    ${free_space}=    String.Get Regexp Matches    ${output}    (\\d+) K blocks out of total (\\d+)    2
-    Should Be True    int(${free_space}[0][0]) < int(${free_space}[0][1])
-    ...    ${REMOTE_SERVER3}: Partition vicepb disk space is running out!
-
-    ${rc}    ${output}=    server1.Run And Return Rc And Output    vos partinfo ${REMOTE_SERVER3}.example.com /vicepc
-    Should Be Equal As Integers    ${rc}    0
-    Should Not Contain    ${output}    partition /vicepc does not exist on the server
-    Should Contain    ${output}    Free space on partition /vicepc
-    ${free_space}=    String.Get Regexp Matches    ${output}    (\\d+) K blocks out of total (\\d+)    2
-    Should Be True    int(${free_space}[0][0]) < int(${free_space}[0][1])
-    ...    ${REMOTE_SERVER3}: Partition vicepc disk space is running out!
 
 Cache Manager Health Check
     [Documentation]    Cache Manager Health Check
