@@ -163,10 +163,10 @@ Keytabs Exist On Client Systems
     ...    This test checks for the existance of robot.keytab and admin.keytab
     ...    on client systems
 
-    client1.File Should Exist    /home/robot/robot.keytab
-    client1.File Should Exist    /home/robot/admin.keytab
-    client2.File Should Exist    /home/robot/robot.keytab
-    client2.File Should Exist    /home/robot/admin.keytab
+    client1.File Should Exist    $HOME/robot.keytab
+    client1.File Should Exist    $HOME/admin.keytab
+    client2.File Should Exist    $HOME/robot.keytab
+    client2.File Should Exist    $HOME/admin.keytab
 
 Binaries Exist And Can Run
     [Documentation]    Binaries Exist And Can Run
