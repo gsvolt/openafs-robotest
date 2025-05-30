@@ -4,8 +4,10 @@ See LICENSE
 
 
 *** Settings ***
-Documentation    Health check suite has test cases that will ensure that an openafs environment is properly
-...    configured before the main openafs test cases are executed.
+Documentation    Health checks suite has test cases that will ensure that an 
+...    OpenAFS environment is properly configured before the main test cases
+...    are ran.
+
 Variables    Variables.py
 Library    Remote    http://${SERVER1}.${DOMAIN}:${PORT}    AS   server1
 Library    Remote    http://${SERVER2}.${DOMAIN}:${PORT}    AS   server2
@@ -18,13 +20,19 @@ Library    String
 *** Test Cases ***
 Robot Servers Are Running
     [Documentation]    Robot Servers Are Running
+    ...
+    ...    This test calls the "Command Should Succeed" OpenAFSLibrary keyword
+    ...    to determine if the robot remote server is accessible and is able to
+    ...    run.
+
     client1.Command Should Succeed   true
     client2.Command Should Succeed   true
 
 OpenAFS Cache Manager Is Running
     [Documentation]    OpenAFS Cache Manager Is Running
     ...
-    ...    Run fs wscell to check whether cache manager is running.
+    ...    This test runs "fs wscell" to get the name of the cell to which the
+    ...    system belongs.
 
     ${rc}    ${output}=    client1.Run And Return Rc And Output    fs wscell
     Log Many   ${rc}    ${output}
@@ -38,6 +46,9 @@ OpenAFS Cache Manager Is Running
 
 Openafs-client Systemd Service Is Running
     [Documentation]    Openafs-client Systemd Service Is Running
+    ...
+    ...    This test checks whether openafs-client is running.
+
     ${rc}    ${output}=    client1.Run And Return Rc And Output    systemctl is-active openafs-client
     Log Many   ${rc}    ${output}
     Should Be Equal As Integers    ${rc}    0
@@ -161,7 +172,9 @@ Keytabs Exist On Client Systems
     [Documentation]    Keytabs Exist On Client Systems
     ...
     ...    This test checks for the existance of robot.keytab and admin.keytab
-    ...    on client systems
+    ...    keytab files in the home directory of both client systems.
+
+    ${rc}    ${current_dir}=    client1.Run And Return Rc And Output    pwd
 
     client1.File Should Exist    $HOME/robot.keytab
     client1.File Should Exist    $HOME/admin.keytab
