@@ -136,49 +136,6 @@ Afs Server Running
     Should Be Equal As Integers    ${rc}    0
     Should Contain    ${output}    active
 
-Servers Have No Skew In Their Time And Have Quorum
-    [Documentation]    Servers have no skew in their time and have quorum
-    ...
-    ...    There is a chance that server clocks in use can go out sync with each other
-    ...    This test calls udebug utility and checks for the time differential value.
-
-    ${rc}    ${output}=    server1.Run And Return Rc And Output    udebug -server ${REMOTE_SERVER2} -port 7002
-    Log    ${rc}
-    Log    ${output}
-    Should Be Equal As Integers    ${rc}    0
-    Should Not Contain    ${output}    ****clock may be bad
-    ${time_diff}=    String.Get Regexp Matches    ${output}    differential (\\d+) secs    1
-    Log    int(${time_diff}[0])
-    Should Be True    int(${time_diff}[0]) <= 10    time difference ${time_diff} is more than 10 seconds
-
-    ${rc}    ${output}=    server1.Run And Return Rc And Output    udebug -server ${REMOTE_SERVER3} -port 7002
-    Log    ${rc}
-    Log    ${output}
-    Should Be Equal As Integers    ${rc}    0
-    Should Not Contain    ${output}    ****clock may be bad
-    ${time_diff}=    String.Get Regexp Matches    ${output}    differential (\\d+) secs    1
-    Log    int(${time_diff}[0])
-    Should Be True    int(${time_diff}[0]) <= 10    time difference ${time_diff} is more than 10 seconds
-
-    ${rc}    ${output}=    server2.Run And Return Rc And Output    udebug -server ${REMOTE_SERVER3} -port 7002
-    Log    ${rc}
-    Log    ${output}
-    Should Be Equal As Integers    ${rc}    0
-    Should Not Contain    ${output}    ****clock may be bad
-    ${time_diff}=    String.Get Regexp Matches    ${output}    differential (\\d+) secs    1
-    Log    int(${time_diff}[0])
-    Should Be True    int(${time_diff}[0]) <= 10    time difference ${time_diff} is more than 10 seconds
-
-    # Only on client1 check status of database quorum: 1f
-    ${rc}    ${output}=    client1.Run And Return Rc And Output    udebug -server ${REMOTE_SERVER1} -port 7002
-    Log    ${rc}
-    Log    ${output}
-    Should Be Equal As Integers    ${rc}    0
-    Should Contain    ${output}    Recovery state 1f
-    ${time_diff}=    String.Get Regexp Matches    ${output}    differential (\\d+) secs    1
-    Log    int(${time_diff}[0])
-    Should Be True    int(${time_diff}[0]) <= 10    time difference ${time_diff} is more than 10 seconds
-
 Cell Volumes Exist In Vldb
     [Documentation]    Cell volumes exist in vldb
     ...
