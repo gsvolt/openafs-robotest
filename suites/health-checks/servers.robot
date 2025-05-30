@@ -1,18 +1,17 @@
 *** Comments ***
-# Copyright (c) 2014-2025 Sine Nomine Associates
-# See LICENSE
+Copyright (c) 2025 Sine Nomine Associates
+See LICENSE
 
 
 *** Settings ***
 Documentation    Health check suite has test cases that will ensure that an openafs environment is properly
 ...    configured before the main openafs test cases are executed.
 Variables    Variables.py
-Library    DateTime
-Library    Remote    http://${REMOTE_SERVER1}.${DOMAIN_NAME}:${PORT}    AS   server1
-Library    Remote    http://${REMOTE_SERVER2}.${DOMAIN_NAME}:${PORT}    AS   server2
-Library    Remote    http://${REMOTE_SERVER3}.${DOMAIN_NAME}:${PORT}    AS   server3
-Library    Remote    http://${REMOTE_CLIENT1}.${DOMAIN_NAME}:${PORT}    AS   client1
-Library    Remote    http://${REMOTE_CLIENT2}.${DOMAIN_NAME}:${PORT}    AS   client2
+Library    Remote    http://${SERVER1}.${DOMAIN}:${PORT}    AS   server1
+Library    Remote    http://${SERVER2}.${DOMAIN}:${PORT}    AS   server2
+Library    Remote    http://${SERVER3}.${DOMAIN}:${PORT}    AS   server3
+Library    Remote    http://${CLIENT1}.${DOMAIN}:${PORT}    AS   client1
+Library    Remote    http://${CLIENT2}.${DOMAIN}:${PORT}    AS   client2
 Library    String
 
 
@@ -29,7 +28,7 @@ File Servers Are Running
     ...    Run bos status (unauthenticated) on both clients and ensure
     ...    openafs servers are running.
 
-    ${rc}    ${output}=    client1.Run And Return Rc And Output    bos status ${REMOTE_SERVER1}
+    ${rc}    ${output}=    client1.Run And Return Rc And Output    bos status ${SERVER1}
     Log    ${rc}
     Log    ${output}
     Should Be Equal As Integers    ${rc}    0
@@ -38,7 +37,7 @@ File Servers Are Running
     ...    Instance dafs, currently running normally.
     ...    Auxiliary status is: file server running.
 
-    ${rc}    ${output}=    client1.Run And Return Rc And Output    bos status ${REMOTE_SERVER2}
+    ${rc}    ${output}=    client1.Run And Return Rc And Output    bos status ${SERVER2}
     Log    ${rc}
     Log    ${output}
     Should Be Equal As Integers    ${rc}    0
@@ -47,7 +46,7 @@ File Servers Are Running
     ...    Instance dafs, currently running normally.
     ...    Auxiliary status is: file server running.
 
-    ${rc}    ${output}=    client1.Run And Return Rc And Output    bos status ${REMOTE_SERVER3}
+    ${rc}    ${output}=    client1.Run And Return Rc And Output    bos status ${SERVER3}
     Log    ${rc}
     Log    ${output}
     Should Be Equal As Integers    ${rc}    0
@@ -56,7 +55,7 @@ File Servers Are Running
     ...    Instance dafs, currently running normally.
     ...    Auxiliary status is: file server running.
 
-    ${rc}    ${output}=    client2.Run And Return Rc And Output    bos status ${REMOTE_SERVER1}
+    ${rc}    ${output}=    client2.Run And Return Rc And Output    bos status ${SERVER1}
     Log    ${rc}
     Log    ${output}
     Should Be Equal As Integers    ${rc}    0
@@ -65,7 +64,7 @@ File Servers Are Running
     ...    Instance dafs, currently running normally.
     ...    Auxiliary status is: file server running.
 
-    ${rc}    ${output}=    client2.Run And Return Rc And Output    bos status ${REMOTE_SERVER2}
+    ${rc}    ${output}=    client2.Run And Return Rc And Output    bos status ${SERVER2}
     Log    ${rc}
     Log    ${output}
     Should Be Equal As Integers    ${rc}    0
@@ -74,7 +73,7 @@ File Servers Are Running
     ...    Instance dafs, currently running normally.
     ...    Auxiliary status is: file server running.
 
-    ${rc}    ${output}=    client2.Run And Return Rc And Output    bos status ${REMOTE_SERVER3}
+    ${rc}    ${output}=    client2.Run And Return Rc And Output    bos status ${SERVER3}
     Log    ${rc}
     Log    ${output}
     Should Be Equal As Integers    ${rc}    0

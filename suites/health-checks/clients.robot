@@ -1,18 +1,17 @@
 *** Comments ***
-# Copyright (c) 2014-2025 Sine Nomine Associates
-# See LICENSE
+Copyright (c) 2025 Sine Nomine Associates
+See LICENSE
 
 
 *** Settings ***
 Documentation    Health check suite has test cases that will ensure that an openafs environment is properly
 ...    configured before the main openafs test cases are executed.
 Variables    Variables.py
-Library    DateTime
-Library    Remote    http://${REMOTE_SERVER1}.${DOMAIN_NAME}:${PORT}    AS   server1
-Library    Remote    http://${REMOTE_SERVER2}.${DOMAIN_NAME}:${PORT}    AS   server2
-Library    Remote    http://${REMOTE_SERVER3}.${DOMAIN_NAME}:${PORT}    AS   server3
-Library    Remote    http://${REMOTE_CLIENT1}.${DOMAIN_NAME}:${PORT}    AS   client1
-Library    Remote    http://${REMOTE_CLIENT2}.${DOMAIN_NAME}:${PORT}    AS   client2
+Library    Remote    http://${SERVER1}.${DOMAIN}:${PORT}    AS   server1
+Library    Remote    http://${SERVER2}.${DOMAIN}:${PORT}    AS   server2
+Library    Remote    http://${SERVER3}.${DOMAIN}:${PORT}    AS   server3
+Library    Remote    http://${CLIENT1}.${DOMAIN}:${PORT}    AS   client1
+Library    Remote    http://${CLIENT2}.${DOMAIN}:${PORT}    AS   client2
 Library    String
 
 
@@ -54,7 +53,7 @@ Cache Manager Health Check
     ...
     ...    Runs cmdebug to determine if cache manager is working
 
-    ${rc}    ${output}=    client1.Run And Return Rc And Output    cmdebug -s ${REMOTE_CLIENT1} -port 7001 -long
+    ${rc}    ${output}=    client1.Run And Return Rc And Output    cmdebug -s ${CLIENT1} -port 7001 -long
     Log    ${output}
     Should Be Equal As Integers    ${rc}    0
     Should Contain Any    ${output}    Lock example.com status: (none_waiting)    for 192.536870912.1.1 [example.com]
@@ -62,7 +61,7 @@ Cache Manager Health Check
     ...    for 192.536870915.2.2 [example.com]    for 192.536870918.1.1 [example.com]
     ...    for 192.536870915.1.1 [example.com]
 
-    ${rc}    ${output}=    client2.Run And Return Rc And Output    cmdebug -s ${REMOTE_CLIENT2} -port 7001 -long
+    ${rc}    ${output}=    client2.Run And Return Rc And Output    cmdebug -s ${CLIENT2} -port 7001 -long
     Should Be Equal As Integers    ${rc}    0
     Log    ${output}
     Should Contain Any    ${output}    Lock example.com status: (none_waiting)
@@ -87,32 +86,32 @@ Clients Can Reach Servers With Rxdebug
     ...
     ...    Runs rxdebug with server names to check if the command succeeds.
 
-    ${rc}    ${output}=    client1.Run And Return Rc And Output    rxdebug -servers ${REMOTE_SERVER1} -port 7003
+    ${rc}    ${output}=    client1.Run And Return Rc And Output    rxdebug -servers ${SERVER1} -port 7003
     Log Many    ${rc}    ${output}
     Should Be Equal As Integers    ${rc}    0
     Should Contain Any    ${output}    Free packets:    Done.
 
-    ${rc}    ${output}=    client1.Run And Return Rc And Output    rxdebug -servers ${REMOTE_SERVER2} -port 7003
+    ${rc}    ${output}=    client1.Run And Return Rc And Output    rxdebug -servers ${SERVER2} -port 7003
     Log Many    ${rc}    ${output}
     Should Be Equal As Integers    ${rc}    0
     Should Contain Any    ${output}    Free packets:    Done.
 
-    ${rc}    ${output}=    client1.Run And Return Rc And Output    rxdebug -servers ${REMOTE_SERVER3} -port 7003
+    ${rc}    ${output}=    client1.Run And Return Rc And Output    rxdebug -servers ${SERVER3} -port 7003
     Log Many    ${rc}    ${output}
     Should Be Equal As Integers    ${rc}    0
     Should Contain Any    ${output}    Free packets:    Done.
 
-    ${rc}    ${output}=    client2.Run And Return Rc And Output    rxdebug -servers ${REMOTE_SERVER1} -port 7003
+    ${rc}    ${output}=    client2.Run And Return Rc And Output    rxdebug -servers ${SERVER1} -port 7003
     Log Many    ${rc}    ${output}
     Should Be Equal As Integers    ${rc}    0
     Should Contain Any    ${output}    Free packets:    Done.
 
-    ${rc}    ${output}=    client2.Run And Return Rc And Output    rxdebug -servers ${REMOTE_SERVER2} -port 7003
+    ${rc}    ${output}=    client2.Run And Return Rc And Output    rxdebug -servers ${SERVER2} -port 7003
     Log Many    ${rc}    ${output}
     Should Be Equal As Integers    ${rc}    0
     Should Contain Any    ${output}    Free packets:    Done.
 
-    ${rc}    ${output}=    client2.Run And Return Rc And Output    rxdebug -servers ${REMOTE_SERVER3} -port 7003
+    ${rc}    ${output}=    client2.Run And Return Rc And Output    rxdebug -servers ${SERVER3} -port 7003
     Log Many    ${rc}    ${output}
     Should Be Equal As Integers    ${rc}    0
     Should Contain Any    ${output}    Free packets:    Done.
@@ -157,3 +156,80 @@ Clients Can Get Afs Directory Listing
     ${rc}    ${output}=    client2.Run And Return Rc And Output    ls /afs/example.com/
     Log    ${output}
     Should Be Equal As Integers    ${rc}    0
+
+Keytabs Exist On Client Systems
+    [Documentation]    Keytabs Exist On Client Systems
+    ...
+    ...    This test checks for the existance of robot.keytab and admin.keytab
+    ...    on client systems
+
+    client1.File Should Exist    /home/robot/robot.keytab
+    client1.File Should Exist    /home/robot/admin.keytab
+    client2.File Should Exist    /home/robot/robot.keytab
+    client2.File Should Exist    /home/robot/admin.keytab
+
+Binaries Exist And Can Run
+    [Documentation]    Binaries Exist And Can Run
+    ...
+    ...    This test ensures that certain binaries that other client tests rely
+    ...    upon are available on the system and can run.
+
+    # OpenAFS fs command.
+    ${rc}    ${output}=    client1.Run And Return Rc And Output    which fs
+    Log Many    ${rc}    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain    ${output}    fs
+    Should Not Contain    ${output}    no fs in
+
+    ${rc}    ${output}=    client1.Run And Return Rc And Output    fs -help
+    Log Many    ${rc}    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain    ${output}    fs: Commands are:
+
+    # OpenAFS cmdebug command.
+    ${rc}    ${output}=    client1.Run And Return Rc And Output    which cmdebug
+    Log Many    ${rc}    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain    ${output}    cmdebug
+    Should Not Contain    ${output}    no cmdebug in
+
+    ${rc}    ${output}=    client1.Run And Return Rc And Output    cmdebug -help
+    Log Many    ${rc}    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain    ${output}    Usage: cmdebug
+
+    # OpenAFS rxdebug command.
+    ${rc}    ${output}=    client1.Run And Return Rc And Output    which rxdebug
+    Log Many    ${rc}    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain    ${output}    rxdebug
+    Should Not Contain    ${output}    no rxdebug in
+
+    ${rc}    ${output}=    client1.Run And Return Rc And Output    rxdebug -help
+    Log Many    ${rc}    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain    ${output}    Usage: rxdebug
+
+    # OpenAFS vos command.
+    ${rc}    ${output}=    client1.Run And Return Rc And Output    which vos
+    Log Many    ${rc}    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain    ${output}    vos
+    Should Not Contain    ${output}    no vos in
+
+    ${rc}    ${output}=    client1.Run And Return Rc And Output    vos -help
+    Log Many    ${rc}    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain    ${output}    vos: Commands are:
+
+    # OpenAFS bos command.
+    ${rc}    ${output}=    client1.Run And Return Rc And Output    which bos
+    Log Many    ${rc}    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain    ${output}    bos
+    Should Not Contain    ${output}    no bos in
+
+    ${rc}    ${output}=    client1.Run And Return Rc And Output    bos help
+    Log Many    ${rc}    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain    ${output}    bos: Commands are:
