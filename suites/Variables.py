@@ -1,3 +1,4 @@
+AFS_USER = "robot"
 SERVER1 = "server1"
 SERVER2 = "server2"
 SERVER3 = "server3"
