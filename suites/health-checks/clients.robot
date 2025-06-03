@@ -4,7 +4,7 @@ See LICENSE
 
 
 *** Settings ***
-Documentation    Health checks suite has test cases that will ensure that an 
+Documentation    Health checks suite has test cases that will ensure that an
 ...    OpenAFS environment is properly configured before the main test cases
 ...    are ran.
 
@@ -175,11 +175,13 @@ Keytabs Exist On Client Systems
     ...    keytab files in the home directory of both client systems.
 
     ${rc}    ${current_dir}=    client1.Run And Return Rc And Output    pwd
+    ${home_dir}=    client1.Get Environment Variable    HOME
+    Log Many    ${rc}    ${current_dir}    ${home_dir}
 
-    client1.File Should Exist    $HOME/robot.keytab
-    client1.File Should Exist    $HOME/admin.keytab
-    client2.File Should Exist    $HOME/robot.keytab
-    client2.File Should Exist    $HOME/admin.keytab
+    client1.File Should Exist    ${home_dir}/robot.keytab
+    client1.File Should Exist    ${home_dir}/admin.keytab
+    client2.File Should Exist    ${home_dir}/robot.keytab
+    client2.File Should Exist    ${home_dir}/admin.keytab
 
 Binaries Exist And Can Run
     [Documentation]    Binaries Exist And Can Run
@@ -246,3 +248,126 @@ Binaries Exist And Can Run
     Log Many    ${rc}    ${output}
     Should Be Equal As Integers    ${rc}    0
     Should Contain    ${output}    bos: Commands are:
+
+    # OpenAFS pts command.
+    ${rc}    ${output}=    client1.Run And Return Rc And Output    which pts
+    Log Many    ${rc}    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain    ${output}    pts
+    Should Not Contain    ${output}    no pts in
+
+    ${rc}    ${output}=    client1.Run And Return Rc And Output    pts help
+    Log Many    ${rc}    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain    ${output}    pts: Commands are:
+
+    # OpenAFS udebug command.
+    ${rc}    ${output}=    client1.Run And Return Rc And Output    which udebug
+    Log Many    ${rc}    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain    ${output}    udebug
+    Should Not Contain    ${output}    no udebug in
+
+    ${rc}    ${output}=    client1.Run And Return Rc And Output    udebug -h
+    Log Many    ${rc}    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain    ${output}    Usage: udebug
+
+    # OpenAFS aklog command.
+    ${rc}    ${output}=    client1.Run And Return Rc And Output    which aklog
+    Log Many    ${rc}    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain    ${output}    aklog
+    Should Not Contain    ${output}    no aklog in
+
+    ${rc}    ${output}=    client1.Run And Return Rc And Output    aklog -h
+    Log Many    ${rc}    ${output}
+    Should Contain    ${output}    Usage: aklog
+
+    # OpenAFS tokens command.
+    ${rc}    ${output}=    client1.Run And Return Rc And Output    which tokens
+    Log Many    ${rc}    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain    ${output}    tokens
+    Should Not Contain    ${output}    no tokens in
+
+    ${rc}    ${output}=    client1.Run And Return Rc And Output    tokens -help
+    Log Many    ${rc}    ${output}
+    Should Contain    ${output}    Usage: tokens
+
+    # OpenAFS unlog command.
+    ${rc}    ${output}=    client1.Run And Return Rc And Output    which unlog
+    Log Many    ${rc}    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain    ${output}    unlog
+    Should Not Contain    ${output}    no unlog in
+
+    ${rc}    ${output}=    client1.Run And Return Rc And Output    unlog -help
+    Log Many    ${rc}    ${output}
+    Should Contain    ${output}    Usage: unlog
+
+    # OpenAFS translate_et command.
+    ${rc}    ${output}=    client1.Run And Return Rc And Output    which translate_et
+    Log Many    ${rc}    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain    ${output}    translate_et
+    Should Not Contain    ${output}    no translate_et in
+
+    ${rc}    ${output}=    client1.Run And Return Rc And Output    translate_et
+    Log Many    ${rc}    ${output}
+    Should Be Equal As Integers    ${rc}    1
+    Should Contain    ${output}    Usage is: translate_et
+
+    # OpenAFS sys command.
+    ${rc}    ${output}=    client1.Run And Return Rc And Output    which sys
+    Log Many    ${rc}    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain    ${output}    sys
+    Should Not Contain    ${output}    no sys in
+
+    ${rc}    ${output}=    client1.Run And Return Rc And Output    sys
+    Log Many    ${rc}    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain    ${output}    amd64_linux26
+
+    # OpenAFS pagsh command.
+    ${rc}    ${output_pagsh}=    client1.Run And Return Rc And Output    which pagsh
+    Log Many    ${rc}    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain    ${output_pagsh}    pagsh
+    Should Not Contain    ${output}    no pagsh in
+
+    ${rc}    ${output}=    client1.Run And Return Rc And Output    test -x ${output_pagsh}
+    Log Many    ${rc}    ${output}
+    Should Be Equal As Integers    ${rc}    0
+
+    # Kerberos kinit command.
+    ${rc}    ${output}=    client1.Run And Return Rc And Output    which kinit
+    Log Many    ${rc}    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain    ${output}    kinit
+    Should Not Contain    ${output}    no kinit in
+
+    ${rc}    ${output}=    client1.Run And Return Rc And Output    kinit -V -h
+    Log Many    ${rc}    ${output}
+    Should Be Equal As Integers    ${rc}    2
+    Should Contain    ${output}    Usage: kinit
+
+    # Kerberos klist command.
+    ${rc}    ${output}=    client1.Run And Return Rc And Output    which klist
+    Log Many    ${rc}    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain    ${output}    klist
+    Should Not Contain    ${output}    no klist in
+
+    # Kerberos kdestroy command.
+    ${rc}    ${output}=    client1.Run And Return Rc And Output    which kdestroy
+    Log Many    ${rc}    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain    ${output}    kdestroy
+    Should Not Contain    ${output}    no kdestroy in
+
+    ${rc}    ${output}=    client1.Run And Return Rc And Output    kdestroy -h
+    Log Many    ${rc}    ${output}
+    Should Be Equal As Integers    ${rc}    2
+    Should Contain    ${output}    Usage: kdestroy
