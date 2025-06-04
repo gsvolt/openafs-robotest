@@ -6,7 +6,9 @@ See LICENSE
 *** Settings ***
 Documentation    Health check suite has test cases that will ensure that an openafs environment is properly
 ...    configured before the main openafs test cases are executed.
+
 Variables    ../Variables.py
+
 Library    Remote    http://${SERVER1}.${DOMAIN}:${PORT}    AS   server1
 Library    Remote    http://${SERVER2}.${DOMAIN}:${PORT}    AS   server2
 Library    Remote    http://${SERVER3}.${DOMAIN}:${PORT}    AS   server3
