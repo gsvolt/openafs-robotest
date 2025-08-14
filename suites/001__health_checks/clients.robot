@@ -9,9 +9,6 @@ Documentation    Health checks suite has test cases that will ensure that an
 ...    are ran.
 
 Variables    ../test_env_vars.py
-Library    Remote    http://${SERVER1}.${DOMAIN}:${PORT}    AS   server1
-Library    Remote    http://${SERVER2}.${DOMAIN}:${PORT}    AS   server2
-Library    Remote    http://${SERVER3}.${DOMAIN}:${PORT}    AS   server3
 Library    Remote    http://${CLIENT1}.${DOMAIN}:${PORT}    AS   client1
 Library    Remote    http://${CLIENT2}.${DOMAIN}:${PORT}    AS   client2
 Library    String
