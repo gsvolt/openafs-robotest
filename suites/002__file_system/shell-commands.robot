@@ -4,7 +4,8 @@ See LICENSE
 
 
 *** Settings ***
-Documentation    Read and write files
+Documentation    Tests that focus on being able to use shell commands to create
+...    read and delete files in OpenAFS.
 
 Variables    ../test_env_vars.py
 Library    Remote    http://${CLIENT1}.${DOMAIN}:${PORT}    AS   client1
@@ -19,9 +20,7 @@ ${FILE_PATH}    ${VOLUME_PATH}/testfs.txt
 
 *** Test Cases ***
 Create a file at a directory path and ensure file exists in directory listing
-    [Documentation]    List directory with ls
-    ...
-    ...    List directory contents using the ls command line utility.
+    [Documentation]    List directory contents using the ls command line utility.
 
     [Tags]    shell-commands
     [Setup]    Setup Test Path
@@ -33,15 +32,13 @@ Create a file at a directory path and ensure file exists in directory listing
 
     [Teardown]    Teardown Test Path
 
-Create a file at a directory path and ensure that directory can be changed into
-    [Documentation]    Change directory with cd
-    ...
-    ...    Change to directory using the cd command line utility.
+Directory can be changed into
+    [Documentation]    Uses change directory command to change directory path
+    ...    into the test volume.
 
     [Tags]    shell-commands
     [Setup]    Setup Test Path
 
-    client1.Create File    path=${FILE_PATH}
     ${rc}    ${output}=    client1.Run And Return Rc And Output    cd ${VOLUME_PATH}
     Log Many    ${rc}    ${output}
     Should Be Equal As Integers    ${rc}    0
@@ -49,15 +46,15 @@ Create a file at a directory path and ensure that directory can be changed into
     [Teardown]    Teardown Test Path
 
 Make and remove a new directory with mkdir and rmdir
-    [Documentation]    Make and remove a new directory with mkdir and rmdir
-    ...
-    ...    Use mkdir linux command to create a new directory within a volume.
-    ...    Then, use rmdir linux command to delete the newly added directory.
+    [Documentation]    Uses mkdir linux command to create a new directory within
+    ...    a volume. Then, uses rmdir linux command to delete the newly added
+    ...    directory.
 
     [Tags]    shell-commands
     [Setup]    Setup Test Path
 
     VAR    ${DIRECTORY}    test_dir
+
     ${rc}    ${output}=    client1.Run And Return Rc And Output    mkdir ${VOLUME_PATH}/${DIRECTORY}
     Log Many    ${rc}    ${output}
     Should Be Equal As Integers    ${rc}    0
@@ -71,10 +68,10 @@ Make and remove a new directory with mkdir and rmdir
     [Teardown]    Teardown Test Path
 
 Copy file with cp and check contents are copied successfully with cat command
-    [Documentation]    Copy file with cp and check contents copied with cat
-    ...
-    ...    Use cp linux command to copy a file from one directory path to another and check if file contents are
-    ...    correct with cat command.
+    [Documentation]    Uses cp linux command to copy a file from one directory
+    ...    path to another and checks if file contents are correct with the cat
+    ...    command.
+
     [Tags]    shell-commands
     [Setup]    Setup Test Path
 
@@ -96,10 +93,11 @@ Copy file with cp and check contents are copied successfully with cat command
 
     [Teardown]    Teardown Test Path
 
-Create a symbolic link using ln
-    [Documentation]    Create a symbolic link using ln
-    ...
-    ...    Create a file, and then create a symbolic link using ln to make sure link is created successfully.
+Create a symbolic link using ln and test its creation using library keyword
+    [Documentation]    Creates a file, and then creates a symbolic link using
+    ...    ln shell command and verifies that link is correct using library
+    ...    keyword.
+
     [Tags]    link
     [Setup]    Setup Test Path
 
@@ -115,17 +113,20 @@ Create a symbolic link using ln
     [Teardown]    Teardown Test Path
 
 Create a hard link using ln
-    [Documentation]    Create a hard link using ln
-    ...
-    ...    Create a file, and then create a hard link using ln. Check that the inode of the hard link is the same as the
-    ...    inode of the original file.
+    [Documentation]    Creates a file, and then create a hard link using ln.
+    ...    Verifies that the inode of the hard link is the same as the inode of
+    ...    the original file.
+
     [Tags]    link
+
     [Setup]    Setup Test Path
 
     client1.Create File    path=${FILE_PATH}    content="Hello World!"
     client1.File Should Exist    path=${FILE_PATH}
 
-    ${rc}    ${output}=    client1.Run And Return Rc And Output    ln ${FILE_PATH} ${VOLUME_PATH}/hardlink-testfs.txt
+    ${rc}    ${output}=    client1.Run And Return Rc And Output
+    ...    ln ${FILE_PATH} ${VOLUME_PATH}/hardlink-testfs.txt
+
     Log Many    ${rc}    ${output}
     client1.Should Exist    ${VOLUME_PATH}/hardlink-testfs.txt
 
@@ -137,14 +138,16 @@ Create a hard link using ln
     [Teardown]    Teardown Test Path
 
 Create an archive using tar
-    [Documentation]    Create an archive using tar
-    ...
-    ...    Create a file, and then add the file to an archive file using tar command.
+    [Documentation]    Creates a file, and then adds the file to an archive file
+    ...    using tar command. Verifies that the archive file type is correct
+    ...    by calling 'file' linux shell command.
+
     [Tags]    shell-commands
     [Setup]    Setup Test Path
 
     client1.Create File    path=${FILE_PATH}    content="Hello World!"
     client1.File Should Exist    path=${FILE_PATH}
+
     ${rc}    ${output}=    client1.Run And Return Rc And Output
     ...    tar -cvf ${VOLUME_PATH}/testfs.tar ${FILE_PATH}
     Log Many    ${rc}    ${output}
@@ -160,8 +163,9 @@ Create an archive using tar
 
 *** Keywords ***
 Setup Test Path
-    [Documentation]
-    ...    Setup keyword sets up a test path
+    [Documentation]    Create a volume as an admin user and login as regular
+    ...    OpenAFS user for all other test cases.
+
     client1.Login    ${AFS_ADMIN}    keytab=${AFS_ADMIN_KEYTAB}
     client1.Volume Should Not Exist    ${VOLUME_NAME}
     client1.Create Volume    ${VOLUME_NAME}
@@ -174,8 +178,9 @@ Setup Test Path
     client1.Login    ${AFS_USER}    keytab=${AFS_USER_KEYTAB}
 
 Teardown Test Path
-    [Documentation]
-    ...     Teardown keyword removes test volume and logs out
+    [Documentation]     Logout as regular OpenAFS user and remove the test
+    ...    volume as admin user.
+
     client1.Logout
     client1.Login    ${AFS_ADMIN}    keytab=${AFS_ADMIN_KEYTAB}
     client1.Remove Volume    ${VOLUME_NAME}

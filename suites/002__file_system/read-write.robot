@@ -4,7 +4,7 @@ See LICENSE
 
 
 *** Settings ***
-Documentation    Read and write files
+Documentation    Tests that focus on creating, reading and writing files.
 
 Variables    ../test_env_vars.py
 Library    Remote    http://${CLIENT1}.${DOMAIN}:${PORT}    AS   client1
@@ -19,11 +19,9 @@ ${FILE_PATH}    /afs/.example.com/test/fs/testfs.txt
 
 *** Test Cases ***
 Create and remove an empty file
-    [Documentation]    Create And Remove An Empty File
-    ...
-    ...    Client1 creates an empty file and both client1 and client2 check
+    [Documentation]    Client1 creates an empty file and all clients check
     ...    for its existence. Client1 removes the file and both clients check
-    ...    that it does not exist anymore.
+    ...    that it has been deleted successfully.
 
     [Tags]    distributed
     [Setup]    Setup Test Path
@@ -41,11 +39,9 @@ Create and remove an empty file
 
     [Teardown]    Teardown Test Path
 
-One client writes a file and another can read it
-    [Documentation]    One client writes a file and another can read it
-    ...
-    ...    Client1 creates a file and writes `Hello World!` in it and client2
-    ...    is able to read its contents successfully.
+After a file is created all clients can read it
+    [Documentation]    Client1 creates a file and writes 'Hello World!' in it.
+    ...    Client2 is able to read the file's contents successfully.
 
     [Setup]    Setup Test Path
 
@@ -56,18 +52,20 @@ One client writes a file and another can read it
     client1.File Should Exist    path=${FILE_PATH}
     client2.File Should Exist    path=${FILE_PATH}
 
+    ${rc}    ${output}=    client1.Run And Return Rc And Output    cat ${FILE_PATH}
+    Log Many    ${rc}    ${output}
+    Should Match Regexp    ${output}    Hello World!
+
     ${rc}    ${output}=    client2.Run And Return Rc And Output    cat ${FILE_PATH}
     Log Many    ${rc}    ${output}
-
     Should Match Regexp    ${output}    Hello World!
 
     [Teardown]    Teardown Test Path
 
-One client writes a file and unauthorized user cannot append the file
-    [Documentation]    One client writes a file and unauthorized user cannot append the file
-    ...
-    ...    Client1 creates a file and writes `Hello World!` in it and client2
-    ...    is unable to read its contents successfully because it is not logged in.
+After a file is created an unauthorized user cannot edit it
+    [Documentation]    Client1 creates a file and writes 'Hello World!' in it.
+    ...    Client2 is unable to read its contents successfully because it is
+    ...    not logged in.
 
     [Setup]    Setup Test Path
 
@@ -84,11 +82,10 @@ One client writes a file and unauthorized user cannot append the file
 
     [Teardown]    Teardown Test Path
 
-One client writes a file and authorized user can append the file
-    [Documentation]    One client writes a file and authorized user can append the file
-    ...
-    ...    Client1 creates a file and writes `Hello World!` in it and client2
-    ...    is able to read its contents successfully because it is logged in.
+After a file is created an authorized user can edit it
+    [Documentation]    Client1 creates a file and writes 'Hello World!' in it.
+    ...    Client2 is able to add content to the file successfully because it
+    ...    is logged in.
 
     [Setup]    Setup Test Path
 
@@ -100,10 +97,9 @@ One client writes a file and authorized user can append the file
     client2.File Should Exist    path=${FILE_PATH}
 
     client2.Login    ${AFS_USER}    keytab=${AFS_USER_KEYTAB}
-
     client2.Append To File    path=${FILE_PATH}    content=OpenAFS
-
     client2.Logout
+
     ${rc}    ${output}=    client1.Run And Return Rc And Output    cat ${FILE_PATH}
     Log Many    ${rc}    ${output}
 
@@ -115,8 +111,9 @@ One client writes a file and authorized user can append the file
 
 *** Keywords ***
 Setup Test Path
-    [Documentation]
-    ...    Setup keyword sets up a test path
+    [Documentation]    Creates a volume as admin user and logs in as regular
+    ...    OpenAFS user.
+
     client1.Login    ${AFS_ADMIN}    keytab=${AFS_ADMIN_KEYTAB}
     client1.Volume Should Not Exist    ${VOLUME_NAME}
     client1.Create Volume    ${VOLUME_NAME}
@@ -129,8 +126,9 @@ Setup Test Path
     client1.Login    ${AFS_USER}    keytab=${AFS_USER_KEYTAB}
 
 Teardown Test Path
-    [Documentation]
-    ...     Teardown keyword removes test volume and logs out
+    [Documentation]     Logs out as regular OpenAFS user and removes test
+    ...    volume as an admin user.
+
     client1.Logout
     client1.Login    ${AFS_ADMIN}    keytab=${AFS_ADMIN_KEYTAB}
     client1.Remove Volume    ${VOLUME_NAME}

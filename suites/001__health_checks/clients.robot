@@ -4,9 +4,8 @@ See LICENSE
 
 
 *** Settings ***
-Documentation    Health checks suite has test cases that will ensure that an
-...    OpenAFS environment is properly configured before the main test cases
-...    are ran.
+Documentation    Client health checks ensure that client environment is properly
+...    configured (pre-requisite for other test cases in the project).
 
 Variables    ../test_env_vars.py
 Library    Remote    http://${CLIENT1}.${DOMAIN}:${PORT}    AS   client1
@@ -16,20 +15,15 @@ Library    String
 
 *** Test Cases ***
 Robot remote server works successfully on all clients
-    [Documentation]    Robot servers are running
-    ...
-    ...    This test calls the "Command Should Succeed" OpenAFSLibrary keyword
-    ...    to determine if the robot remote server is accessible and is able to
-    ...    run.
+    [Documentation]    Runs 'true' command on each OpenAFS client to verify
+    ...    that Robot Framework remote server is accessible and operational.
 
     client1.Command Should Succeed   true
     client2.Command Should Succeed   true
 
 Test user keytabs are present on all clients
-    [Documentation]    Keytabs exist on client systems
-    ...
-    ...    This test checks for the existance of robot.keytab and admin.keytab
-    ...    keytab files in the home directory of both client systems.
+    [Documentation]    Checks for the existence of robot.keytab and admin.keytab
+    ...    keytab files in the home directory of all clients.
 
     ${rc}    ${current_dir}=    client1.Run And Return Rc And Output    pwd
     ${home_dir}=    client1.Get Environment Variable    HOME
@@ -41,10 +35,8 @@ Test user keytabs are present on all clients
     client2.File Should Exist    ${home_dir}/admin.keytab
 
 Fs command shows cell name on all clients
-    [Documentation]    OpenAFS cache manager is running
-    ...
-    ...    This test runs "fs wscell" to get the name of the cell to which the
-    ...    system belongs.
+    [Documentation]    Runs "fs wscell" command to get the name of the cell to
+    ...    which the system belongs.
 
     ${rc}    ${output}=    client1.Run And Return Rc And Output    fs wscell
     Log Many   ${rc}    ${output}
@@ -57,9 +49,8 @@ Fs command shows cell name on all clients
     Should Contain    ${output}    example.com
 
 Cache manager is running on all clients
-    [Documentation]    OpenAFS-client systemd service is running
-    ...
-    ...    This test checks whether openafs-client is running.
+    [Documentation]    This test checks whether openafs-client systemd service
+    ...    is running on all clients.
 
     ${rc}    ${output}=    client1.Run And Return Rc And Output    systemctl is-active openafs-client
     Log Many   ${rc}    ${output}
@@ -72,9 +63,7 @@ Cache manager is running on all clients
     Should Contain    ${output}    active
 
 Cmdebug shows cell name for all clients
-    [Documentation]    Cache manager health check
-    ...
-    ...    Runs cmdebug to determine if cache manager is working
+    [Documentation]    Runs cmdebug to verify if cache manager is working.
 
     ${rc}    ${output}=    client1.Run And Return Rc And Output    cmdebug -server ${CLIENT1} -port 7001 -long
     Log    ${output}
@@ -87,9 +76,8 @@ Cmdebug shows cell name for all clients
     Should Contain    ${output}    Lock example.com status: (none_waiting)
 
 Cache manager's Rx server is running on all clients
-    [Documentation]    Clients can execute rxdebug locally
-    ...
-    ...    Runs rxdebug with server name localhost to check if the command succeeds.
+    [Documentation]    Runs rxdebug locally to verify cache manager's rx server
+    ...    is operational.
 
     ${rc}    ${output}=    client1.Run And Return Rc And Output    rxdebug -servers localhost -port 7001
     Log Many    ${rc}    ${output}
@@ -104,9 +92,7 @@ Cache manager's Rx server is running on all clients
     Should Contain    ${output}    Done.
 
 Run bos command for all clients and ensure that OpenAFS services are running on all servers
-    [Documentation]    Clients can gather status from servers using bos command
-    ...
-    ...    Runs bos status on client systems to get status from servers.
+    [Documentation]    Runs bos status on client systems to get status from servers.
 
     ${rc}    ${output}=    client1.Run And Return Rc And Output    bos status -server ${SERVER1}
     Log Many    ${rc}    ${output}
@@ -150,7 +136,7 @@ Run bos command for all clients and ensure that OpenAFS services are running on 
     Should Contain    ${output}    Instance dafs, currently running normally.
     Should Contain    ${output}    Auxiliary status is: file server running.
 
-Run mount command for all clients and ensure that afs matches in the output
+Run mount command for all clients and ensure that there is an afs mount point
     [Documentation]    Mount point exists for afs
     ...
     ...    Use mount command to verify if AFS mount point exists
@@ -163,10 +149,43 @@ Run mount command for all clients and ensure that afs matches in the output
     Log Many    ${rc}    ${output}
     Should Be Equal As Integers    ${rc}    0
 
+OpenAFS is mounted as a filesystem on all clients
+    [Documentation]    Checks the directory listing of /proc/fs to verify that
+    ...    OpenAFS is mounted.
+
+    ${rc}    ${output}=    client1.Run And Return Rc And Output    ls /proc/fs | grep afs
+    Log Many    ${rc}    ${output}
+    Should Be Equal As Integers    ${rc}    0
+
+    Should Contain    ${output}    afs
+
+    ${rc}    ${output}=    client2.Run And Return Rc And Output    ls /proc/fs | grep afs
+    Log Many    ${rc}    ${output}
+    Should Be Equal As Integers    ${rc}    0
+
+    Should Contain    ${output}    afs
+
+OpenAFS is mounted and CellServDB contains test and production cell names on all clients
+    [Documentation]    Checks the /proc/fs/openafs/CellServDB file contains
+    ...    cell names: example.com and sinenomine.net on all clients.
+
+    ${rc}    ${output}=    client1.Run And Return Rc And Output
+    ...    cat /proc/fs/openafs/CellServDB | grep -E "example.com|sinenomine.net"
+    Log Many    ${rc}    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain    ${output}    example.com
+    Should Contain    ${output}    sinenomine.net
+
+    ${rc}    ${output}=    client2.Run And Return Rc And Output
+    ...    cat /proc/fs/openafs/CellServDB | grep -E "example.com|sinenomine.net"
+    Log Many    ${rc}    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain    ${output}    example.com
+    Should Contain    ${output}    sinenomine.net
+
 OpenAFS kernel module is loaded for all clients
-    [Documentation]    Kernel module loaded
-    ...
-    ...    Use lsmod to check if OpenAFS kernel module is loaded.
+    [Documentation]    Uses lsmod to check if OpenAFS kernel module is loaded on
+    ...    all clients.
 
     ${rc}    ${output}=    client1.Run And Return Rc And Output    lsmod | grep afs
     Log Many    ${rc}    ${output}
@@ -179,9 +198,8 @@ OpenAFS kernel module is loaded for all clients
     Should Contain    ${output}    openafs
 
 Top-level cell volume is mounted on all clients
-    [Documentation]    Clients can get afs directory listing
-    ...
-    ...    Calls ls command to get a directory listing from /afs/example.com
+    [Documentation]    Calls ls command to get a directory listing from
+    ...    /afs/example.com
 
     ${rc}    ${output}=    client1.Run And Return Rc And Output    ls /afs/example.com/
     Log    ${output}
@@ -192,10 +210,8 @@ Top-level cell volume is mounted on all clients
     Should Be Equal As Integers    ${rc}    0
 
 OpenAFS and kerberos commands are installed on all clients
-    [Documentation]    Binaries exist and can run
-    ...
-    ...    This test ensures that certain binaries that other client tests rely
-    ...    upon are available on the system and can run.
+    [Documentation]    Ensures binaries that other client tests rely upon are
+    ...    available on the system and are operational.
 
     # OpenAFS fs command.
     ${rc}    ${output}=    client1.Run And Return Rc And Output    which fs
@@ -389,7 +405,7 @@ OpenAFS and kerberos commands are installed on all clients
     Should Contain    ${output}    Usage: kdestroy
 
 Robot user account can acquire token with keytab on all clients
-    [Documentation]    Robot user account can acquire token
+    [Documentation]    Robot user account can acquire token on all clients.
 
     client1.Login    ${AFS_USER}    keytab=${AFS_USER_KEYTAB}
     ${rc}    ${output}=    client1.Run And Return Rc And Output    tokens
@@ -406,7 +422,7 @@ Robot user account can acquire token with keytab on all clients
     client2.Logout
 
 Admin user account can acquire token with keytab on all clients
-    [Documentation]    Admin user account can acquire token
+    [Documentation]    Admin user account can acquire token on all clients.
 
     client1.Login    ${AFS_ADMIN}    keytab=${AFS_ADMIN_KEYTAB}
     ${rc}    ${output}=    client1.Run And Return Rc And Output    tokens

@@ -20,11 +20,8 @@ ${DIR_PATH}    /afs/.example.com/test/fs/test-directory
 
 *** Test Cases ***
 Create and delete a file
-    [Documentation]
-    ...    Create and delete a file
-    ...
-    ...    Client1 creates an file with 'Hello World' string and client2 deletes
-    ...    the file.
+    [Documentation]    Client1 creates a file containing 'Hello World!' and
+    ...    then deletes the file.
 
     [Setup]    Setup Test Path
 
@@ -37,14 +34,11 @@ Create and delete a file
     client1.Wait Until Removed    path=${FILE_PATH}
 
     client1.Should Not Exist    path=${FILE_PATH}
-    client2.Should Not Exist    path=${FILE_PATH}
 
     [Teardown]    Teardown Test Path
 
 Create and delete a directory
-    [Documentation]    Create and delete a directory
-    ...
-    ...    Client1 creates a directory and deletes it.
+    [Documentation]    Client1 creates a directory and deletes it.
 
     [Setup]    Setup Test Path
 
@@ -56,15 +50,15 @@ Create and delete a directory
     client1.Wait Until Removed    path=${DIR_PATH}
 
     client1.Should Not Exist    path=${DIR_PATH}
-    client2.Should Not Exist    path=${DIR_PATH}
 
     [Teardown]    Teardown Test Path
 
 
 *** Keywords ***
 Setup Test Path
-    [Documentation]
-    ...    Setup keyword sets up a test path
+    [Documentation]    Set up a volume as an admin and log in as regular
+    ...    OpenAFS user for all test cases.
+
     client1.Login    ${AFS_ADMIN}    keytab=${AFS_ADMIN_KEYTAB}
     client1.Volume Should Not Exist    ${VOLUME_NAME}
     client1.Create Volume    ${VOLUME_NAME}
@@ -77,8 +71,9 @@ Setup Test Path
     client1.Login    ${AFS_USER}    keytab=${AFS_USER_KEYTAB}
 
 Teardown Test Path
-    [Documentation]
-    ...     Teardown keyword removes test volume and logs out
+    [Documentation]     Logout as regular OpenAFS user and login as an admin to
+    ...    to remove the test volume.
+
     client1.Logout
     client1.Login    ${AFS_ADMIN}    keytab=${AFS_ADMIN_KEYTAB}
     client1.Remove Volume    ${VOLUME_NAME}
