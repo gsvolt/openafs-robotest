@@ -18,7 +18,7 @@ ${FILE_PATH}    ${VOLUME_PATH}/testfs.txt
 
 
 *** Test Cases ***
-List directory with ls
+Create a file at a directory path and ensure file exists in directory listing
     [Documentation]    List directory with ls
     ...
     ...    List directory contents using the ls command line utility.
@@ -33,7 +33,7 @@ List directory with ls
 
     [Teardown]    Teardown Test Path
 
-Change directory with cd
+Create a file at a directory path and ensure that directory can be changed into
     [Documentation]    Change directory with cd
     ...
     ...    Change to directory using the cd command line utility.
@@ -70,7 +70,7 @@ Make and remove a new directory with mkdir and rmdir
 
     [Teardown]    Teardown Test Path
 
-Copy file with cp and check contents copied with cat
+Copy file with cp and check contents are copied successfully with cat command
     [Documentation]    Copy file with cp and check contents copied with cat
     ...
     ...    Use cp linux command to copy a file from one directory path to another and check if file contents are

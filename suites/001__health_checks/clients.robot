@@ -18,7 +18,7 @@ Library    String
 
 
 *** Test Cases ***
-Robot servers are running
+Robot remote server works successfully on all clients
     [Documentation]    Robot servers are running
     ...
     ...    This test calls the "Command Should Succeed" OpenAFSLibrary keyword
@@ -28,7 +28,22 @@ Robot servers are running
     client1.Command Should Succeed   true
     client2.Command Should Succeed   true
 
-OpenAFS cache manager is running
+Test user keytabs are present on all clients
+    [Documentation]    Keytabs exist on client systems
+    ...
+    ...    This test checks for the existance of robot.keytab and admin.keytab
+    ...    keytab files in the home directory of both client systems.
+
+    ${rc}    ${current_dir}=    client1.Run And Return Rc And Output    pwd
+    ${home_dir}=    client1.Get Environment Variable    HOME
+    Log Many    ${rc}    ${current_dir}    ${home_dir}
+
+    client1.File Should Exist    ${home_dir}/robot.keytab
+    client1.File Should Exist    ${home_dir}/admin.keytab
+    client2.File Should Exist    ${home_dir}/robot.keytab
+    client2.File Should Exist    ${home_dir}/admin.keytab
+
+Fs command shows cell name on all clients
     [Documentation]    OpenAFS cache manager is running
     ...
     ...    This test runs "fs wscell" to get the name of the cell to which the
@@ -44,7 +59,7 @@ OpenAFS cache manager is running
     Should Be Equal As Integers    ${rc}    0
     Should Contain    ${output}    example.com
 
-OpenAFS-client systemd service is running
+Cache manager is running on all clients
     [Documentation]    OpenAFS-client systemd service is running
     ...
     ...    This test checks whether openafs-client is running.
@@ -59,7 +74,7 @@ OpenAFS-client systemd service is running
     Should Be Equal As Integers    ${rc}    0
     Should Contain    ${output}    active
 
-Cache manager health check
+Cmdebug shows cell name for all clients
     [Documentation]    Cache manager health check
     ...
     ...    Runs cmdebug to determine if cache manager is working
@@ -74,7 +89,7 @@ Cache manager health check
     Log    ${output}
     Should Contain    ${output}    Lock example.com status: (none_waiting)
 
-Clients can execute rxdebug locally
+Cache manager's Rx server is running on all clients
     [Documentation]    Clients can execute rxdebug locally
     ...
     ...    Runs rxdebug with server name localhost to check if the command succeeds.
@@ -91,7 +106,7 @@ Clients can execute rxdebug locally
     Should Contain    ${output}    Free packets:
     Should Contain    ${output}    Done.
 
-Clients can gather status from servers using bos command
+Run bos command for all clients and ensure that OpenAFS services are running on all servers
     [Documentation]    Clients can gather status from servers using bos command
     ...
     ...    Runs bos status on client systems to get status from servers.
@@ -138,7 +153,7 @@ Clients can gather status from servers using bos command
     Should Contain    ${output}    Instance dafs, currently running normally.
     Should Contain    ${output}    Auxiliary status is: file server running.
 
-Mount point exists for afs
+Run mount command for all clients and ensure that afs matches in the output
     [Documentation]    Mount point exists for afs
     ...
     ...    Use mount command to verify if AFS mount point exists
@@ -151,7 +166,7 @@ Mount point exists for afs
     Log Many    ${rc}    ${output}
     Should Be Equal As Integers    ${rc}    0
 
-Kernel module loaded
+OpenAFS kernel module is loaded for all clients
     [Documentation]    Kernel module loaded
     ...
     ...    Use lsmod to check if OpenAFS kernel module is loaded.
@@ -166,31 +181,20 @@ Kernel module loaded
     Should Be Equal As Integers    ${rc}    0
     Should Contain    ${output}    openafs
 
-Clients can get afs directory listing
+Top-level cell volume is mounted on all clients
     [Documentation]    Clients can get afs directory listing
     ...
     ...    Calls ls command to get a directory listing from /afs/example.com
+
+    ${rc}    ${output}=    client1.Run And Return Rc And Output    ls /afs/example.com/
+    Log    ${output}
+    Should Be Equal As Integers    ${rc}    0
 
     ${rc}    ${output}=    client2.Run And Return Rc And Output    ls /afs/example.com/
     Log    ${output}
     Should Be Equal As Integers    ${rc}    0
 
-Keytabs exist on client systems
-    [Documentation]    Keytabs exist on client systems
-    ...
-    ...    This test checks for the existance of robot.keytab and admin.keytab
-    ...    keytab files in the home directory of both client systems.
-
-    ${rc}    ${current_dir}=    client1.Run And Return Rc And Output    pwd
-    ${home_dir}=    client1.Get Environment Variable    HOME
-    Log Many    ${rc}    ${current_dir}    ${home_dir}
-
-    client1.File Should Exist    ${home_dir}/robot.keytab
-    client1.File Should Exist    ${home_dir}/admin.keytab
-    client2.File Should Exist    ${home_dir}/robot.keytab
-    client2.File Should Exist    ${home_dir}/admin.keytab
-
-Binaries exist and can run
+OpenAFS and kerberos commands are installed on all clients
     [Documentation]    Binaries exist and can run
     ...
     ...    This test ensures that certain binaries that other client tests rely
@@ -387,18 +391,36 @@ Binaries exist and can run
     Should Be Equal As Integers    ${rc}    2
     Should Contain    ${output}    Usage: kdestroy
 
-Robot user account can acquire token
+Robot user account can acquire token with keytab on all clients
     [Documentation]    Robot user account can acquire token
 
     client1.Login    ${AFS_USER}    keytab=${AFS_USER_KEYTAB}
     ${rc}    ${output}=    client1.Run And Return Rc And Output    tokens
     Log Many    ${rc}    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain    ${output}    AFS ID
     client1.Logout
 
-Admin user account can acquire token
+    client2.Login    ${AFS_USER}    keytab=${AFS_USER_KEYTAB}
+    ${rc}    ${output}=    client2.Run And Return Rc And Output    tokens
+    Log Many    ${rc}    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain    ${output}    AFS ID
+    client2.Logout
+
+Admin user account can acquire token with keytab on all clients
     [Documentation]    Admin user account can acquire token
 
     client1.Login    ${AFS_ADMIN}    keytab=${AFS_ADMIN_KEYTAB}
     ${rc}    ${output}=    client1.Run And Return Rc And Output    tokens
     Log Many    ${rc}    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain    ${output}    AFS ID
     client1.Logout
+
+    client2.Login    ${AFS_ADMIN}    keytab=${AFS_ADMIN_KEYTAB}
+    ${rc}    ${output}=    client2.Run And Return Rc And Output    tokens
+    Log Many    ${rc}    ${output}
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain    ${output}    AFS ID
+    client2.Logout

@@ -17,7 +17,7 @@ Library    String
 
 
 *** Test Cases ***
-Robot servers are running
+Robot remote server works successfully on all servers
     [Documentation]    Robot servers are running
     ...
     ...    Runs 'true' command on each server to check if it succeeds.
@@ -26,7 +26,7 @@ Robot servers are running
     server2.Command Should Succeed   true
     server3.Command Should Succeed   true
 
-File servers are running
+Run bos command on all clients and ensure that OpenAFS services are running on all servers
     [Documentation]    File servers are running
     ...
     ...    Run bos status (unauthenticated) on both clients and ensure
@@ -49,8 +49,7 @@ File servers are running
     Should Contain    ${output}    Auxiliary status is: file server running.
 
     ${rc}    ${output}=    client1.Run And Return Rc And Output    bos status ${SERVER3}
-    Log    ${rc}
-    Log    ${output}
+    Log Many    ${rc}    ${output}
     Should Be Equal As Integers    ${rc}    0
     Should Contain    ${output}    Instance ptserver, currently running normally.
     Should Contain    ${output}    Instance vlserver, currently running normally.
@@ -58,8 +57,7 @@ File servers are running
     Should Contain    ${output}    Auxiliary status is: file server running.
 
     ${rc}    ${output}=    client2.Run And Return Rc And Output    bos status ${SERVER1}
-    Log    ${rc}
-    Log    ${output}
+    Log Many    ${rc}    ${output}
     Should Be Equal As Integers    ${rc}    0
     Should Contain    ${output}    Instance ptserver, currently running normally.
     Should Contain    ${output}    Instance vlserver, currently running normally.
@@ -67,8 +65,7 @@ File servers are running
     Should Contain    ${output}    Auxiliary status is: file server running.
 
     ${rc}    ${output}=    client2.Run And Return Rc And Output    bos status ${SERVER2}
-    Log    ${rc}
-    Log    ${output}
+    Log Many    ${rc}    ${output}
     Should Be Equal As Integers    ${rc}    0
     Should Contain    ${output}    Instance ptserver, currently running normally.
     Should Contain    ${output}    Instance vlserver, currently running normally.
@@ -76,15 +73,14 @@ File servers are running
     Should Contain    ${output}    Auxiliary status is: file server running.
 
     ${rc}    ${output}=    client2.Run And Return Rc And Output    bos status ${SERVER3}
-    Log    ${rc}
-    Log    ${output}
+    Log Many    ${rc}    ${output}
     Should Be Equal As Integers    ${rc}    0
     Should Contain    ${output}    Instance ptserver, currently running normally.
     Should Contain    ${output}    Instance vlserver, currently running normally.
     Should Contain    ${output}    Instance dafs, currently running normally.
     Should Contain    ${output}    Auxiliary status is: file server running.
 
-OpenAFS-server systemd service is running
+Check openafs-server service status on all servers and ensure they are running
     [Documentation]    OpenAFS-server systemd service is running
     ${rc}    ${output}=    server1.Run And Return Rc And Output    systemctl is-active openafs-server
     Log Many    ${rc}    ${output}
@@ -118,12 +114,6 @@ Kerberos KDC is running
     [Documentation]    Kerberos KDC is running
     ...
     ...    Check status of krb5kdc service and make sure it is active and running
-
-    ${rc}    ${output}=    server1.Run And Return Rc And Output    systemctl status krb5kdc.service
-    Should Be Equal As Integers    ${rc}    0
-    Should Contain    ${output}    Active: active (running)
-    Should Contain    ${output}    Loaded: loaded
-    Should Contain    ${output}    enabled
 
     ${rc}    ${output}=    server1.Run And Return Rc And Output    systemctl status krb5kdc.service
     Should Be Equal As Integers    ${rc}    0
